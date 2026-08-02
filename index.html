@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404. That's an Error.</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media',
+            theme: {
+                extend: {
+                    fontFamily: {sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'system-ui', 'sans-serif'],
+                        mono: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Dynamic Favicon Link -->
+    <link id="favicon" rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1zFW38ve7O-TNwEVI2gdN27XyJaJQBrT_">
+
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 500;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        canvas {
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body class="h-full w-full bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 overflow-hidden flex flex-col justify-between font-medium relative">
+
+    <!-- Header Section (Physically hidden via 'hidden' class until animation completes, strictly pinned to the top-left corner) -->
+    <header id="app-header" class="hidden opacity-0 absolute top-6 left-6 md:top-8 md:left-12 z-30 transition-opacity duration-1000 ease-out">
+        <!-- Dynamic Logo Section (Exactly as original size, links to target URL) -->
+        <a href="https://robo-universe.com" class="relative w-14 h-14 rounded-xl overflow-hidden shadow-md border border-slate-100 dark:border-slate-800 flex items-center justify-center bg-slate-100 dark:bg-slate-800 pointer-events-auto hover:opacity-90 active:scale-95 transition-all">
+            <!-- Bright Mode Logo (Hidden in dark mode) -->
+            <img id="logo-bright" src="https://lh3.googleusercontent.com/d/1zFW38ve7O-TNwEVI2gdN27XyJaJQBrT_" 
+                 alt="Logo Light" class="absolute inset-0 w-full h-full object-contain p-1 dark:opacity-0 transition-opacity duration-300"
+                 onerror="this.src='https://placehold.co/100x100/eaeaea/333333?text=Logo'">
+            <!-- Dark Mode Logo (Hidden in light mode) -->
+            <img id="logo-dark" src="https://lh3.googleusercontent.com/d/1zbJKMMwEvzpOwnkKhmFDKSAq76Sq_ukP" 
+                 alt="Logo Dark" class="absolute inset-0 w-full h-full object-contain p-1 opacity-0 dark:opacity-100 transition-opacity duration-300"
+                 onerror="this.src='https://placehold.co/100x100/111827/ffffff?text=Logo'">
+        </a>
+    </header>
+
+    <!-- Invisible ErrorStatus Element for programmatic modification -->
+    <div id="ErrorStatus" class="hidden" aria-hidden="true">404</div>
+
+    <!-- Main Visualizer Area -->
+    <main class="flex-grow flex flex-col items-center justify-center relative w-full overflow-hidden px-4">
+        <!-- Canvas Layer for Dynamic Atom Assembly -->
+        <div id="canvas-container" class="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-100 transition-opacity duration-500">
+            <canvas id="gridCanvas" class="w-full h-full"></canvas>
+        </div>
+
+        <!-- Resolved Central Error Information Card -->
+        <div id="resolved-view" class="z-10 text-center max-w-2xl mx-auto px-6 opacity-0 translate-y-8 pointer-events-none transition-all duration-1000 ease-out select-text flex flex-col items-center justify-center">
+            
+            <div class="flex flex-col items-center justify-center gap-y-2 mb-4 select-text">
+                <!-- Static plain text code header in Helvetica Medium -->
+                <h1 id="resolved-code" class="text-5xl md:text-7xl font-semibold tracking-tight text-slate-900 dark:text-white drop-shadow-sm select-all">
+                    404
+                </h1>
+                
+                <h1 id="resolved-status-text" class="text-5xl md:text-7xl font-semibold tracking-tight text-slate-900 dark:text-white drop-shadow-sm">
+                    That's an Error.
+                </h1>
+            </div>
+
+            <p id="resolved-desc" class="text-sm md:text-base text-slate-400 dark:text-slate-500 mt-4 max-w-lg mx-auto leading-relaxed">
+                The server has not found anything matching the Request-URI.
+            </p>
+        </div>
+    </main>
+
+    <!-- Spacer representing footer clearance -->
+    <div class="w-full h-8 bg-transparent"></div>
+
+    <!-- Comprehensive Status Code database mapping -->
+    <script>
+        const httpErrorDatabase = {
+            400: { title: "Bad Request", desc: "The server could not understand the request due to malformed syntax." },
+            401: { title: "Unauthorized", desc: "The request requires user authentication." },
+            402: { title: "Payment Required", desc: "Reserved for future utilization." },
+            403: { title: "Forbidden", desc: "The server understood the request but refuses to authorize it." },
+            404: { title: "Not Found", desc: "The server cannot find the requested resource. This link is broken or does not exist." },
+            405: { title: "Method Not Allowed", desc: "The request method is known by the server but is not supported." },
+            406: { title: "Not Acceptable", desc: "The web server cannot produce responses matching accepted parameters." },
+            407: { title: "Proxy Authentication Required", desc: "Authentication must first be completed through the proxy." },
+            408: { title: "Request Timeout", desc: "The server timed out waiting for the incoming request." },
+            409: { title: "Conflict", desc: "The request could not be completed due to a state conflict." },
+            410: { title: "Gone", desc: "The requested resource is no longer available and has been permanently removed." },
+            411: { title: "Length Required", desc: "The request was rejected because it did not specify the required content length." },
+            412: { title: "Precondition Failed", desc: "One or more conditions specified in the request headers evaluated to false." },
+            413: { title: "Payload Too Large", desc: "The request entity is larger than limits defined by the server." },
+            414: { title: "URI Too Long", desc: "The request URI is longer than the server is willing to interpret." },
+            415: { title: "Unsupported Media Type", desc: "The media format of requested data is not supported." },
+            416: { title: "Range Not Satisfiable", desc: "The range specified by the request cannot be fulfilled." },
+            417: { title: "Expectation Failed", desc: "The expectation given in the Expect request-header field could not be met." },
+            418: { title: "I'm a Teapot", desc: "The server refuses the attempt to brew coffee with a teapot." },
+            421: { title: "Misdirected Request", desc: "The request was directed at a server that is not able to produce a response." },
+            422: { title: "Unprocessable Content", desc: "The request was well-formed but was unable to be followed due to semantic errors." },
+            423: { title: "Locked", desc: "The resource that is being accessed is currently locked." },
+            424: { title: "Failed Dependency", desc: "The request failed because it depended on another action which failed." },
+            425: { title: "Too Early", desc: "The server is unwilling to risk processing a request that might be replayed." },
+            426: { title: "Upgrade Required", desc: "The server refuses to perform the request using the current protocol." },
+            428: { title: "Precondition Required", desc: "The origin server requires the request to be conditional to prevent conflicts." },
+            429: { title: "Too Many Requests", desc: "The user has sent too many requests in a given amount of time." },
+            431: { title: "Request Header Fields Too Large", desc: "The server is unwilling to process the request because header fields are too large." },
+            451: { title: "Unavailable For Legal Reasons", desc: "The server is denying access as a consequence of legal demands." },
+            500: { title: "Internal Server Error", desc: "The server encountered an unexpected condition that prevented it from fulfilling the request." },
+            501: { title: "Not Implemented", desc: "The server does not support the functionality required to fulfill the request." },
+            502: { title: "Bad Gateway", desc: "The server received an invalid response from upstream." },
+            503: { title: "Service Unavailable", desc: "The server is temporarily unable to handle the request due to maintenance." },
+            504: { title: "Gateway Timeout", desc: "The server did not receive a timely response from an upstream server." },
+            505: { title: "HTTP Version Not Supported", desc: "The server does not support the HTTP protocol version used in the request." },
+            506: { title: "Variant Also Negotiates", desc: "Transparent content negotiation results in a circular reference." },
+            507: { title: "Insufficient Storage", desc: "The server is unable to store the representation needed to complete the request." },
+            508: { title: "Loop Detected", desc: "The server terminated an operation because it encountered an infinite loop." },
+            510: { title: "Not Extended", desc: "Further extensions to the request are required for the server to fulfill it." },
+            511: { title: "Network Authentication Required", desc: "The client needs to authenticate to gain network access." }
+        };
+    </script>
+
+    <!-- Core Interactive Logic & Particle Assembly Animation Engine -->
+    <script>
+        // Setup state observers on window.ErrorStatus to track dynamic code adjustments
+        let _errorStatus = "403";
+        Object.defineProperty(window, 'ErrorStatus', {
+            get: function() { return _errorStatus; },
+            set: function(val) {
+                const parsed = parseInt(val, 10);
+                if (!isNaN(parsed) && parsed >= 400 && parsed <= 599) {
+                    _errorStatus = parsed.toString();
+                    const el = document.getElementById('ErrorStatus');
+                    if (el) el.textContent = _errorStatus;
+                    const codeEl = document.getElementById('resolved-code');
+                    if (codeEl && codeEl.textContent !== _errorStatus) {
+                        codeEl.textContent = _errorStatus;
+                    }
+                    triggerSimulation();
+                }
+            }
+        });
+
+        // DOM elements
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+        const resolvedView = document.getElementById('resolved-view');
+        const canvasContainer = document.getElementById('canvas-container');
+        const resolvedCode = document.getElementById('resolved-code');
+        const resolvedStatusText = document.getElementById('resolved-status-text');
+        const resolvedDesc = document.getElementById('resolved-desc');
+        const favicon = document.getElementById('favicon');
+        const headerEl = document.getElementById('app-header');
+
+        // Animation config
+        const totalAnimationDuration = 5500; // Single continuous sequence length (ms)
+        const assemblyPoint = 0.70; // 70% point where orbit moves to text targets
+        
+        let animationStartTime = 0;
+        let animationFrameId = null;
+        let isAnimating = false;
+
+        // Particle configurations
+        const totalParticles = 650;
+        let particles = [];
+        let textTargets = [];
+
+        // Auto-sizing canvas helper
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            if (!isAnimating) drawStaticState();
+        });
+
+        resizeCanvas();
+
+        // Helper to get theme colors
+        function getThemeColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return {
+                text: isDark ? 'rgba(248, 250, 252, 0.95)' : 'rgba(15, 23, 42, 0.95)',
+                particleColor: isDark ? 'rgba(129, 140, 248, 0.9)' : 'rgba(79, 70, 229, 0.9)',
+                particleTrace: isDark ? 'rgba(129, 140, 248, 0.05)' : 'rgba(79, 70, 229, 0.04)'
+            };
+        }
+
+        // Clear state canvas
+        function drawStaticState() {
+            ctx.clearRect(0, 0, canvas.width / window.devicePixelRatio, canvas.height / window.devicePixelRatio);
+        }
+
+        // Analyze current code text offscreen in Helvetica Medium
+        function generateTextTargets(text) {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = 320;
+            tempCanvas.height = 120;
+            
+            tempCtx.fillStyle = 'black';
+            tempCtx.font = '500 75px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText(text, tempCanvas.width / 2, tempCanvas.height / 2);
+            
+            const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            const data = imgData.data;
+            const points = [];
+            
+            const step = 3.5; 
+            for (let y = 0; y < tempCanvas.height; y += step) {
+                for (let x = 0; x < tempCanvas.width; x += step) {
+                    const idx = (Math.floor(y) * tempCanvas.width + Math.floor(x)) * 4;
+                    if (data[idx + 3] > 100) {
+                        points.push({
+                            x: (x - tempCanvas.width / 2) / tempCanvas.height,
+                            y: (y - tempCanvas.height / 2) / tempCanvas.height
+                        });
+                    }
+                }
+            }
+            return points;
+        }
+
+        // Create particles
+        function initParticles() {
+            particles = [];
+            textTargets = generateTextTargets(window.ErrorStatus);
+            
+            for (let i = 0; i < totalParticles; i++) {
+                const target = textTargets[i % textTargets.length] || { x: 0, y: 0 };
+                
+                particles.push({
+                    tx: target.x,
+                    ty: target.y,
+                    orbitRadiusX: 180 + Math.random() * 240,
+                    orbitRadiusY: 80 + Math.random() * 120,
+                    angle: Math.random() * Math.PI * 2,
+                    angleSpeed: (0.01 + Math.random() * 0.015) * (Math.random() > 0.5 ? 1 : -1),
+                    tilt: (Math.random() - 0.5) * 1.1, 
+                    size: 9 + Math.floor(Math.random() * 5),
+                    x: 0,
+                    y: 0
+                });
+            }
+        }
+
+        // Start animation lifecycle
+        function triggerSimulation() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            isAnimating = true;
+            animationStartTime = performance.now();
+            
+            // Reset layouts & physically remove Header / Details panel completely
+            resolvedView.classList.remove('opacity-100', 'translate-y-0');
+            resolvedView.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
+            
+            headerEl.classList.remove('opacity-100');
+            headerEl.classList.add('hidden', 'opacity-0');
+            
+            canvasContainer.style.opacity = '1';
+
+            // Apply titles
+            document.title = `${window.ErrorStatus}. That's an Error.`;
+
+            initParticles();
+            animate(performance.now());
+        }
+
+        // Main Simulation Loop
+        function animate(now) {
+            const elapsed = now - animationStartTime;
+            const w = canvas.width / window.devicePixelRatio;
+            const h = canvas.height / window.devicePixelRatio;
+            const colors = getThemeColors();
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (elapsed < totalAnimationDuration) {
+                const globalProgress = elapsed / totalAnimationDuration;
+
+                // Speed factor accelerates smoothly as atoms move closer to center
+                const speedMult = 0.4 + Math.pow(globalProgress, 2) * 2.8;
+
+                // Calculate spiral contraction smoothly
+                const spiralScale = 2.5 - (2.1 * Math.pow(globalProgress, 1.5));
+
+                if (globalProgress < assemblyPoint) {
+                    // Phase 1: Orbiting swarms with extreme continuous acceleration
+                    particles.forEach(p => {
+                        p.angle += p.angleSpeed * speedMult;
+                        
+                        const currentRadX = p.orbitRadiusX * spiralScale;
+                        const currentRadY = p.orbitRadiusY * spiralScale;
+
+                        const rawX = Math.cos(p.angle) * currentRadX;
+                        const rawY = Math.sin(p.angle) * currentRadY;
+
+                        p.x = w / 2 + (rawX * Math.cos(p.tilt) - rawY * Math.sin(p.tilt));
+                        p.y = h / 2 + (rawX * Math.sin(p.tilt) + rawY * Math.cos(p.tilt));
+
+                        // Trajectory markers
+                        ctx.fillStyle = colors.particleTrace;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Render Helvetica Plain text dynamic error code particle (matches active code status)
+                        ctx.font = `500 ${p.size}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
+                        ctx.fillStyle = colors.particleColor;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(window.ErrorStatus, p.x, p.y);
+                    });
+                } else {
+                    // Phase 2: Assemble cleanly using continuous mathematical position maps
+                    const assemblyProgress = (globalProgress - assemblyPoint) / (1 - assemblyPoint);
+                    const assembleWeight = Math.min(1.0, Math.pow(assemblyProgress, 1.5));
+                    
+                    const textScale = Math.min(w * 0.45, h * 0.45) * (1.1 - assemblyProgress * 0.1); 
+                    const alpha = Math.max(0, 1.0 - assemblyProgress);
+
+                    particles.forEach(p => {
+                        // Keep calculating continuous orbital coordinate path exactly as Phase 1
+                        p.angle += p.angleSpeed * speedMult;
+                        const currentRadX = p.orbitRadiusX * spiralScale;
+                        const currentRadY = p.orbitRadiusY * spiralScale;
+
+                        const rawX = Math.cos(p.angle) * currentRadX;
+                        const rawY = Math.sin(p.angle) * currentRadY;
+
+                        const orbitX = w / 2 + (rawX * Math.cos(p.tilt) - rawY * Math.sin(p.tilt));
+                        const orbitY = h / 2 + (rawX * Math.sin(p.tilt) + rawY * Math.cos(p.tilt));
+
+                        const targetX = w / 2 + p.tx * textScale;
+                        const targetY = h / 2 + p.ty * textScale;
+
+                        // Interpolate between continuous orbit position and static target text position
+                        // This prevents any structural "jump" at the border point
+                        const finalX = orbitX + (targetX - orbitX) * assembleWeight;
+                        const finalY = orbitY + (targetY - orbitY) * assembleWeight;
+
+                        ctx.font = `500 ${p.size * (1.0 + assembleWeight * 0.25)}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
+                        ctx.fillStyle = colors.particleColor.replace('0.9', (0.9 * alpha).toString());
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(window.ErrorStatus, finalX, finalY);
+                    });
+                }
+
+                animationFrameId = requestAnimationFrame(animate);
+
+            } else {
+                // Final static resolved state
+                isAnimating = false;
+                
+                const currentMeta = httpErrorDatabase[window.ErrorStatus] || { 
+                    title: "Status Override", 
+                    desc: "Interactive status error triggered." 
+                };
+
+                resolvedCode.textContent = window.ErrorStatus;
+                resolvedStatusText.textContent = "That's an Error.";
+                resolvedDesc.textContent = currentMeta.desc;
+
+                // Bring elements in gracefully post animation
+                resolvedView.classList.remove('pointer-events-none');
+                resolvedView.classList.add('opacity-100', 'translate-y-0');
+
+                // Bring the header physically back into the DOM layout, trigger a tiny browser reflow, and fade it in
+                headerEl.classList.remove('hidden');
+                void headerEl.offsetHeight; // Forces browser paint update
+                headerEl.classList.add('opacity-100');
+
+                canvasContainer.style.opacity = '0.05';
+            }
+        }
+
+        // System Dark Mode Listeners & Layout Sync
+        function checkTheme() {
+            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            if (!isAnimating) drawStaticState();
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', checkTheme);
+        checkTheme();
+
+        // Trigger simulation on startup
+        window.addEventListener('load', () => {
+            triggerSimulation();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
