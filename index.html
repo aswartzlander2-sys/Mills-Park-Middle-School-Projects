@@ -1,418 +1,969 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404. That's an Error.</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'media',
-            theme: {
-                extend: {
-                    fontFamily: {sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'system-ui', 'sans-serif'],
-                        mono: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Dynamic Favicon Link -->
-    <link id="favicon" rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1zFW38ve7O-TNwEVI2gdN27XyJaJQBrT_">
-
-    <style>
-        body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-weight: 500;
-            transition: background-color 0.5s ease, color 0.5s ease;
-        }
-        canvas {
-            image-rendering: pixelated;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Mills Park Tech Assistance</title>
+  <link rel="icon" type="image/png" href="https://static.robo-universe.com/assets/logos/robo/logo/500x500.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <script>
+    tailwind.config = { darkMode: 'media', theme: { extend: { fontFamily: { sans: ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'] } } } };
+  </script>
+  <style>
+    html { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 500; }
+    @keyframes swipeLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes reveal { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .swipe-left { animation: swipeLeft .42s cubic-bezier(.22,.8,.22,1) both; }
+    .reveal { animation: reveal .38s ease-out both; }
+    .choice.selected { border-color: #22c55e; background-color: #f0fdf4; color: #14532d; }
+    @media (prefers-color-scheme: dark) { .choice.selected { background-color: rgba(20,83,45,.35); color: #dcfce7; } }
+    .choice.detected { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.16); }
+    .tts-highlight { background: #fde047; color: #111827; border-radius: 2px; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-9px); } 40%,80% { transform: translateX(9px); } }
+    .shake { animation: shake .38s ease-in-out; }
+    @keyframes chatEnter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .chat-enter { animation: chatEnter .28s ease-out both; }
+    #chatMessages > :first-child, #clientChatMessages > :first-child { margin-top: auto; }
+  </style>
 </head>
-<body class="h-full w-full bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 overflow-hidden flex flex-col justify-between font-medium relative">
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+  <header id="siteHeader" class="relative z-[65] h-[65px] border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <div class="flex h-full items-center justify-between gap-4 px-5 sm:px-8">
+      <div class="flex min-w-0 items-center">
+        <img class="h-9 w-9 shrink-0 rounded-lg object-cover" src="https://static.robo-universe.com/assets/logos/robo/logo/500x500.png" alt="Mills Park Tech Assistance logo" />
+        <div class="ml-3 text-sm font-bold leading-tight text-slate-900 sm:text-base dark:text-white"><span id="headerProgramText">Mills Park Middle School Tech Assistance Program</span></div>
+      </div>
+      <div id="headerActions" class="flex shrink-0 items-center gap-3">
+        <button id="nextButton" type="button" class="hidden rounded-full bg-black px-5 py-2 text-sm font-bold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:bg-white dark:text-black">Next</button>
+        <button id="restartButton" type="button" class="hidden rounded-full border-2 border-black bg-white px-5 py-2 text-sm font-bold text-black transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:border-white dark:bg-white dark:text-black">Restart</button>
+        <button id="accessibilityButton" type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-300 bg-white text-slate-900 transition hover:border-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-900 dark:text-white" aria-label="Read this screen aloud" title="Read this screen aloud">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor"><path d="M3 10v4h4l5 4V6l-5 4H3zm11.5 2A3.5 3.5 0 0 0 12 8.65v1.9a1.6 1.6 0 0 1 0 2.9v1.9a3.5 3.5 0 0 0 2.5-3.35zm0-7.18v2.06a5.5 5.5 0 0 1 0 10.24v2.06a7.5 7.5 0 0 0 0-14.36z"/></svg>
+        </button>
+      </div>
+      <div id="caseIdHeader" class="hidden shrink-0 items-center gap-2">
+        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Case ID:</span>
+        <input id="caseIdValue" type="text" disabled class="w-72 rounded-lg border border-slate-300 bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700 opacity-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" />
+        <button id="copyCaseIdButton" type="button" class="rounded-lg border-2 border-black bg-white px-3 py-1 text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Copy</button>
+      </div>
+    </div>
+  </header>
 
-    <!-- Header Section (Physically hidden via 'hidden' class until animation completes, strictly pinned to the top-left corner) -->
-    <header id="app-header" class="hidden opacity-0 absolute top-6 left-6 md:top-8 md:left-12 z-30 transition-opacity duration-1000 ease-out">
-        <!-- Dynamic Logo Section (Exactly as original size, links to target URL) -->
-        <a href="https://robo-universe.com" class="relative w-14 h-14 rounded-xl overflow-hidden shadow-md border border-slate-100 dark:border-slate-800 flex items-center justify-center bg-slate-100 dark:bg-slate-800 pointer-events-auto hover:opacity-90 active:scale-95 transition-all">
-            <!-- Bright Mode Logo (Hidden in dark mode) -->
-            <img id="logo-bright" src="https://lh3.googleusercontent.com/d/1zFW38ve7O-TNwEVI2gdN27XyJaJQBrT_" 
-                 alt="Logo Light" class="absolute inset-0 w-full h-full object-contain p-1 dark:opacity-0 transition-opacity duration-300"
-                 onerror="this.src='https://placehold.co/100x100/eaeaea/333333?text=Logo'">
-            <!-- Dark Mode Logo (Hidden in light mode) -->
-            <img id="logo-dark" src="https://lh3.googleusercontent.com/d/1zbJKMMwEvzpOwnkKhmFDKSAq76Sq_ukP" 
-                 alt="Logo Dark" class="absolute inset-0 w-full h-full object-contain p-1 opacity-0 dark:opacity-100 transition-opacity duration-300"
-                 onerror="this.src='https://placehold.co/100x100/111827/ffffff?text=Logo'">
-        </a>
-    </header>
+  <div id="responderSubheader" class="hidden h-[92px] border-b border-slate-200 bg-white px-5 py-3 dark:border-slate-800 dark:bg-slate-900">
+    <div class="flex h-full gap-2 overflow-x-auto">
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">CALL</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" disabled class="flex-1 cursor-not-allowed rounded-md border-2 border-slate-300 bg-slate-100 text-xs font-bold text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500">Request</button></div></div>
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">ROBO ASSIST</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" class="flex-1 rounded-md border-2 border-black bg-white text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Request</button></div></div>
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">6SERVICE</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" class="flex-1 rounded-md border-2 border-black bg-white text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Request</button></div></div>
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">7SERVICE</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" class="flex-1 rounded-md border-2 border-black bg-white text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Request</button></div></div>
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">8SERVICE</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" class="flex-1 rounded-md border-2 border-black bg-white text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Request</button></div></div>
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">ADMIN</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" class="flex-1 rounded-md border-2 border-black bg-white text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Request</button></div></div>
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">GENSERVICE</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" class="flex-1 rounded-md border-2 border-black bg-white text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Request</button></div></div>
+      <div class="service-card flex h-full w-72 shrink-0 items-stretch overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950"><div class="flex min-w-0 flex-1 items-center px-4 text-sm font-bold">POLICE</div><div class="service-actions flex w-24 flex-col gap-1 p-1"><button type="button" class="flex-1 rounded-md border-2 border-black bg-black text-xs font-bold text-white dark:border-white dark:bg-white dark:text-black">Chat</button><button type="button" class="flex-1 rounded-md border-2 border-black bg-white text-xs font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Request</button></div></div>
+    </div>
+  </div>
 
-    <!-- Invisible ErrorStatus Element for programmatic modification -->
-    <div id="ErrorStatus" class="hidden" aria-hidden="true">404</div>
+  <div id="loginModal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/70 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div id="loginDialog" class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-900">
+      <div class="flex items-center justify-between"><h2 id="loginTitle" class="text-xl font-bold">Log In</h2><button id="closeLoginModal" type="button" class="rounded-full px-2 text-xl leading-none text-slate-500 hover:text-black dark:hover:text-white" aria-label="Close login dialog">×</button></div>
+      <div class="mt-6 space-y-4">
+        <div><label for="loginUsername" class="mb-1 block text-sm font-bold">Username</label><input id="loginUsername" type="text" autocomplete="username" class="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white" /></div>
+        <div><label for="loginPassword" class="mb-1 block text-sm font-bold">Password</label><input id="loginPassword" type="password" autocomplete="current-password" class="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white" /></div>
+        <button id="loginButton" type="button" class="w-full rounded-full bg-black px-5 py-3 text-sm font-bold text-white hover:bg-slate-800 dark:bg-white dark:text-black">Log In</button>
+      </div>
+    </div>
+  </div>
 
-    <!-- Main Visualizer Area -->
-    <main class="flex-grow flex flex-col items-center justify-center relative w-full overflow-hidden px-4">
-        <!-- Canvas Layer for Dynamic Atom Assembly -->
-        <div id="canvas-container" class="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-100 transition-opacity duration-500">
-            <canvas id="gridCanvas" class="w-full h-full"></canvas>
+  <main id="mainContent" class="mx-auto w-full max-w-6xl overflow-hidden px-5 py-8 sm:px-8 sm:py-12">
+    <section id="landing" aria-labelledby="form-title">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 id="form-title" class="text-2xl font-bold tracking-tight sm:text-3xl">Mills Park Remote Tech Assistance Form</h1>
+        <button id="startButton" type="button" class="inline-flex w-full items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 sm:w-auto dark:bg-white dark:text-black dark:hover:bg-slate-200">Start Form</button>
+      </div>
+      <p class="mx-auto mt-10 max-w-4xl text-center text-xs leading-relaxed text-slate-500 sm:text-sm dark:text-slate-400">By clicking “Start Form”, you are agreeing that you will not prank call or abuse this service. Violating this agreement may result in a temporary or a permanent ban, depending on the severity of your violation. Your data will be sent to Robo Universal for processing, but will be immediately deleted when the tech assistance case is closed. It may take 3 days to 1 month to close your case after the issue is reported (<span id="threeDaysDate"></span> - <span id="oneMonthDate"></span>). If we are unable to assist you here, you may be sent to the media center. (Room 1401) If you have violated a school rule, or any technological agreement, we will not be able to assist you, your eligibility for remote tech assistance will be revoked and you will be reported to MPMS Staff. Your data is saved, so do not share any sensitive information. Please click start form to begin.</p>
+    </section>
+
+    <section id="formFlow" class="hidden" aria-live="polite">
+      <div id="questionZero" class="swipe-left">
+        <h1 class="text-center text-2xl font-bold tracking-tight sm:text-3xl">What's Your name?</h1>
+        <div class="mx-auto mt-8 max-w-2xl">
+          <label class="sr-only" for="studentName">Your name</label>
+          <input id="studentName" type="text" maxlength="35" autocomplete="name" class="w-full rounded-xl border-2 border-slate-200 bg-white px-5 py-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-900" placeholder="Enter your name" />
+          <div class="mt-2 flex items-center justify-between px-1 text-[11px] font-medium sm:text-xs"><span id="nameMinimumCounter" class="text-red-600 dark:text-red-400">0/3 minimum characters</span><span id="nameMaximumCounter" class="text-slate-500 dark:text-slate-400">0/35 maximum characters</span></div>
         </div>
+        <div id="gradeRoomQuestion" class="mx-auto mt-10 hidden max-w-2xl">
+          <h2 class="text-center text-xl font-bold tracking-tight sm:text-2xl">What is your grade?</h2>
+          <div class="mt-6"> 
+            <label class="sr-only" for="grade">Grade</label>
+            <select id="grade" class="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-4 font-bold text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white"><option value="">Select an option</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option></select>
+          </div>
+        </div>
+        <div id="classroomQuestion" class="mx-auto mt-10 hidden max-w-2xl">
+          <h2 class="text-center text-xl font-bold tracking-tight sm:text-2xl">What floor are you on?</h2>
+          <div class="mt-6"><label class="sr-only" for="classroom">Classroom</label><select id="classroom" class="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-4 font-bold text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white"><option value="">Select an option</option><option value="floor1">Floor 1</option><option value="floor2">Floor 2</option><option value="floor3">Floor 3</option></select>
+          <div id="mapPanel" class="relative mt-6 aspect-[4/3] w-full overflow-hidden rounded-2xl bg-black" aria-label="Floor plan selector">
+            <img id="floorMap" class="hidden h-full w-full object-contain" alt="Selected floor plan. Click your approximate location." />
+            <p id="mapPlaceholder" class="absolute inset-0 flex items-center justify-center px-6 text-center text-sm font-bold text-slate-500">Select a floor to view its map.</p>
+            <button id="mapMarker" type="button" aria-label="Selected location" class="pointer-events-none absolute hidden h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-blue-600 shadow-[0_0_0_12px_rgba(37,99,235,.23)]"></button>
+          </div>
+          <p class="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">Click the map to open it full size, then select your approximate location.</p>
 
-        <!-- Resolved Central Error Information Card -->
-        <div id="resolved-view" class="z-10 text-center max-w-2xl mx-auto px-6 opacity-0 translate-y-8 pointer-events-none transition-all duration-1000 ease-out select-text flex flex-col items-center justify-center">
-            
-            <div class="flex flex-col items-center justify-center gap-y-2 mb-4 select-text">
-                <!-- Static plain text code header in Helvetica Medium -->
-                <h1 id="resolved-code" class="text-5xl md:text-7xl font-semibold tracking-tight text-slate-900 dark:text-white drop-shadow-sm select-all">
-                    404
-                </h1>
-                
-                <h1 id="resolved-status-text" class="text-5xl md:text-7xl font-semibold tracking-tight text-slate-900 dark:text-white drop-shadow-sm">
-                    That's an Error.
-                </h1>
+          <div id="mapModal" class="fixed inset-0 z-50 hidden bg-black/80 p-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Select your location on the floor plan">
+            <div class="mx-auto flex h-full w-full max-w-none flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900">
+              <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
+                <div><h3 class="font-bold">Select your approximate location</h3><p class="text-xs text-slate-500 dark:text-slate-400">Use the controls or your mouse wheel to zoom, then click the map.</p></div>
+                <div class="flex items-center gap-2"><button id="zoomOut" type="button" class="rounded-lg border border-slate-300 px-3 py-1 font-bold dark:border-slate-600" aria-label="Zoom out">−</button><button id="zoomIn" type="button" class="rounded-lg border border-slate-300 px-3 py-1 font-bold dark:border-slate-600" aria-label="Zoom in">+</button><button id="closeMapModal" type="button" class="ml-2 rounded-full bg-black px-4 py-2 text-sm font-bold text-white dark:bg-white dark:text-black">Done</button></div>
+              </div>
+              <div id="mapViewport" class="flex-1 overflow-auto bg-slate-200 p-4 dark:bg-black"><div id="modalMapWrap" class="relative inline-block min-w-full"><img id="modalFloorMap" class="block max-w-none" alt="Floor plan selection map" /><span id="modalMarker" class="pointer-events-none absolute hidden h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-blue-600 shadow-[0_0_0_12px_rgba(37,99,235,.23)]"></span></div></div>
             </div>
-
-            <p id="resolved-desc" class="text-sm md:text-base text-slate-400 dark:text-slate-500 mt-4 max-w-lg mx-auto leading-relaxed">
-                The server has not found anything matching the Request-URI.
-            </p>
+          </div></div>
         </div>
+      </div>
+
+      <div id="questionOne" class="hidden">
+        <h1 class="text-center text-2xl font-bold tracking-tight sm:text-3xl">What device are you using?</h1>
+        <div class="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+          <button class="choice relative flex min-h-[190px] flex-col items-center justify-between rounded-2xl border-2 border-slate-200 bg-white p-5 text-center transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900" data-os="ChromeOS">
+            <span class="os-badge hidden rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">Your OS</span>
+            <img class="mt-3 h-20 w-20" src="https://cdn.simpleicons.org/googlechrome" alt="Google Chrome icon" />
+            <span class="text-base font-bold">ChromeOS</span>
+          </button>
+          <button class="choice relative flex min-h-[190px] flex-col items-center justify-between rounded-2xl border-2 border-slate-200 bg-white p-5 text-center transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900" data-os="iPadOS">
+            <span class="os-badge hidden rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">Your OS</span>
+            <img class="mt-3 h-20 w-20 dark:invert" src="https://cdn.simpleicons.org/apple/111827" alt="Apple icon" />
+            <span class="text-base font-bold">iPadOS</span>
+          </button>
+          <button class="choice relative flex min-h-[190px] flex-col items-center justify-between rounded-2xl border-2 border-slate-200 bg-white p-5 text-center transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900" data-os="Windows">
+            <span class="os-badge hidden rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white">Your OS</span>
+            <svg class="mt-3 h-20 w-20 text-sky-600" viewBox="0 0 96 96" fill="currentColor" aria-hidden="true"><path d="m8 17 36-5v35H8zm40-6 40-6v42H48zm-40 40h36v35L8 81zm40 0h40v40l-40-6z"/></svg>
+            <span class="text-base font-bold">Windows</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="questionTwo" class="mt-10 hidden">
+        <h2 class="text-center text-xl font-bold tracking-tight sm:text-2xl">Is this the device you are currently using?</h2>
+        <div class="mx-auto mt-6 flex max-w-3xl flex-col gap-3">
+          <button class="choice rounded-xl border-2 border-slate-200 bg-white px-5 py-5 text-left text-sm font-bold transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900" data-device-answer="same">This is the same device experiencing the issue</button>
+          <button class="choice rounded-xl border-2 border-slate-200 bg-white px-5 py-5 text-left text-sm font-bold transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900" data-device-answer="different">This is a different device that is reporting on behalf of a different device</button>
+        </div>
+      </div>
+
+      <div id="questionThree" class="hidden">
+        <h1 class="text-center text-2xl font-bold tracking-tight sm:text-3xl">Describe the issue you are experiencing</h1>
+        <div class="mx-auto mt-8 max-w-5xl">
+          <label class="sr-only" for="issueDescription">Describe the issue you are experiencing</label>
+          <textarea id="issueDescription" maxlength="5000" class="min-h-[45vh] w-full resize-y rounded-2xl border-2 border-slate-200 bg-white p-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-900" placeholder="Tell us what is happening with your device..."></textarea>
+          <div class="mt-2 flex items-center justify-between px-1 text-[11px] font-medium sm:text-xs">
+            <span id="minimumCounter" class="text-red-600 dark:text-red-400">0/20 minimum characters</span>
+            <span id="maximumCounter" class="text-slate-500 dark:text-slate-400">0/5000 maximum characters</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="questionFour" class="hidden">
+        <h1 class="text-center text-2xl font-bold tracking-tight sm:text-3xl">Do you know how to re-create this issue?</h1>
+        <div class="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2">
+          <button class="choice rounded-2xl border-2 border-slate-200 bg-white px-6 py-8 text-center text-lg font-bold transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900" data-recreate="yes">Yes</button>
+          <button class="choice rounded-2xl border-2 border-slate-200 bg-white px-6 py-8 text-center text-lg font-bold transition hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900" data-recreate="no">No</button>
+        </div>
+        <div id="recreateDetails" class="mx-auto mt-10 hidden max-w-5xl">
+          <h2 class="text-center text-xl font-bold tracking-tight sm:text-2xl">Describe how to re-create this issue</h2>
+          <label class="sr-only" for="recreateDescription">Describe how to re-create this issue</label>
+          <textarea id="recreateDescription" maxlength="5000" class="mt-6 min-h-[35vh] w-full resize-y rounded-2xl border-2 border-slate-200 bg-white p-5 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-blue-900" placeholder="List the steps to re-create the issue..."></textarea>
+          <div class="mt-2 flex items-center justify-between px-1 text-[11px] font-medium sm:text-xs">
+            <span id="recreateMinimumCounter" class="text-red-600 dark:text-red-400">0/20 minimum characters</span>
+            <span id="recreateMaximumCounter" class="text-slate-500 dark:text-slate-400">0/5000 maximum characters</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="questionFive" class="hidden">
+        <h1 class="text-center text-2xl font-bold tracking-tight sm:text-3xl">Let's get a photo of you</h1>
+        <div class="mx-auto mt-8 max-w-md">
+          <div class="relative aspect-square overflow-hidden rounded-2xl bg-black shadow-sm">
+            <video id="cameraPreview" class="h-full w-full object-cover" autoplay playsinline muted></video>
+            <img id="capturedPhoto" class="hidden h-full w-full object-cover" alt="Your captured photo" />
+            <div id="cameraMessage" class="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-slate-300">Camera preview will appear here.</div>
+          </div>
+          <button id="captureButton" type="button" class="mt-5 w-full rounded-full bg-black px-6 py-3 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-black">Capture Photo</button>
+          <button id="retakeButton" type="button" class="mt-3 hidden w-full rounded-full border-2 border-slate-300 px-6 py-3 text-sm font-bold text-slate-800 transition hover:border-slate-500 dark:border-slate-600 dark:text-white">Retake Photo</button>
+          <p class="mt-4 text-center text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">An image of your person is required to validate the tech assistance case. All images are deleted when the tech assistance case is closed.</p>
+        </div>
+      </div>
+
+      <div id="questionSix" class="hidden">
+        <h1 class="text-center text-2xl font-bold tracking-tight sm:text-3xl">Confirm Case Details?</h1>
+        <p class="mx-auto mt-6 max-w-2xl text-center text-xs leading-relaxed text-slate-500 sm:text-sm dark:text-slate-400">When you click “Connect” you will be connected with Mills Park Tech Assistance. When you are connected, you cannot cancel or close your case when it has been enabled. Refresh this page to restart the form.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="safetyModal" class="fixed inset-0 z-[90] hidden items-center justify-center bg-black/75 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="safetyTitle">
+    <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-900">
+      <h2 id="safetyTitle" class="text-xl font-bold">Viewer Discretion is advised</h2>
+      <p class="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">Robo Universal Safety Filters has flagged this file as unsuitable for viewing. You may view the file anyways but it is not recommended. This file was flagged because it may contain the following: sexually explicit content, Child Sexual Abuse Material (CSAM), extreme violence or hate acts, malware, or other illegal content. If you do not wish to view this content, you can return to the responder home screen by clicking “Return To Safety.” You can also view the file anyways, acknowledging the risks and clicking “Open Anyways.”</p>
+      <div class="mt-6 flex justify-end gap-3"><button id="openFlaggedFile" type="button" class="rounded-full border-2 border-black bg-white px-4 py-3 text-sm font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Open anyways</button><button id="returnToSafety" type="button" class="rounded-full border-2 border-black bg-black px-4 py-3 text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Return to Safety</button></div>
+    </div>
+  </div>
+
+  <div id="fileViewerModal" class="fixed inset-0 z-[85] hidden items-center justify-center bg-black/70 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="fileViewerTitle">
+    <div class="flex h-[80vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900">
+      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-700"><div class="flex min-w-0 items-center gap-3"><span id="fileViewerIcon" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"><i class="fa-solid fa-file"></i></span><h2 id="fileViewerTitle" class="truncate text-sm font-bold">File Viewer</h2></div><button id="closeFileViewer" type="button" class="rounded-full px-2 text-2xl leading-none text-slate-500 hover:text-black dark:hover:text-white" aria-label="Close file viewer">×</button></div>
+      <div id="fileViewerContent" class="flex flex-1 items-center justify-center overflow-auto bg-slate-100 p-5 dark:bg-slate-950"></div>
+      <div class="flex justify-end border-t border-slate-200 px-5 py-3 dark:border-slate-700"><button id="closeFileViewerButton" type="button" class="rounded-full border-2 border-black bg-white px-4 py-2 text-sm font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Close</button></div>
+    </div>
+  </div>
+
+  <section id="clientChatScreen" class="fixed inset-x-0 bottom-0 top-[65px] z-[60] hidden flex-col bg-slate-50 p-5 dark:bg-slate-950" aria-label="Connected chat">
+    <div id="clientChatMessages" class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain"></div>
+    <div class="mt-4 flex items-end gap-3">
+      <textarea id="clientChatComposer" rows="1" class="min-h-14 flex-1 resize-none rounded-2xl border-2 border-slate-200 bg-white px-4 py-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white" placeholder="Start typing then click Send"></textarea>
+      <button id="clientSendButton" type="button" class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-black bg-black text-white dark:border-white dark:bg-white dark:text-black" aria-label="Send message"><svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </div>
+  </section>
+
+  <section id="adminScreen" class="hidden flex h-[calc(100vh-157px)] overflow-hidden bg-slate-50 dark:bg-slate-950" aria-label="Admin screen">
+    <aside class="h-full w-1/4 shrink-0 overflow-y-auto border-r border-slate-300 p-3 dark:border-slate-700">
+      <div class="flex gap-2">
+        <div class="relative h-16 w-1/3 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900"><span class="block text-[10px] font-medium text-slate-500 dark:text-slate-400">Arc</span><span id="architectureValue" class="mt-1 block text-lg font-bold text-slate-500 dark:text-slate-400">DETECTING</span></div>
+        <div class="relative h-16 flex-1 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900"><span class="block text-[10px] font-medium text-slate-500 dark:text-slate-400">Status</span><span class="mt-1 block text-lg font-bold text-slate-500 dark:text-slate-400">HOLD</span></div>
+      </div>
+      <div class="mt-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+        <span class="block text-[10px] font-medium text-slate-500 dark:text-slate-400">Active Case ID</span>
+        <input type="text" disabled class="mt-2 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 font-mono text-sm text-slate-500 opacity-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400" aria-label="Active Case ID" />
+      </div>
+      <div class="mt-3 min-h-64 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+        <div class="flex items-center justify-between gap-2"><span class="block text-[10px] font-medium text-slate-500 dark:text-slate-400">Resources</span><span id="caseStorageLabel" class="text-[10px] font-medium text-slate-500 dark:text-slate-400">0 B/32.0 MB</span></div>
+        <div class="mt-3 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-100 text-[10px] uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400"><tr><th class="px-3 py-2 font-medium">Filename</th></tr></thead>
+            <tbody id="resourcesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="mt-3 min-h-48 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+        <span class="block text-[10px] font-medium text-slate-500 dark:text-slate-400">Notes</span>
+        <textarea id="responderNotes" class="mt-3 min-h-36 w-full resize-y rounded-lg border border-slate-200 bg-slate-50 p-3 font-mono text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" placeholder="> "></textarea>
+      </div>
+      <div class="mt-3 min-h-40 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+        <span class="block text-[10px] font-medium text-slate-500 dark:text-slate-400">Basic Information</span>
+        <textarea id="basicInformation" disabled class="mt-3 min-h-24 w-full resize-none rounded-lg border border-slate-200 bg-slate-100 p-3 font-mono text-sm text-slate-500 opacity-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400" aria-label="Basic Information">Caller Name: —
+Grade: —
+Operating System: —
+IP Address: —
+Location: —</textarea>
+      </div>
+      <div class="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+        <iframe id="callerMap" class="h-56 w-full border-0" title="Caller location map" loading="lazy" referrerpolicy="no-referrer"></iframe>
+      </div>
+    </aside>
+    <main class="flex h-full flex-1 overflow-hidden" aria-label="Responder workspace">
+      <section class="h-full w-1/3 overflow-auto border-r border-slate-300 p-5 dark:border-slate-700" aria-label="Responder workspace left panel">
+        <div class="flex flex-col gap-3">
+          <button id="shareScreenRequestButton" type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Share Screen Request</button>
+          <button id="fileUploadRequestButton" type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">File Upload Request</button>
+          <button type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Load Rules Form</button>
+          <button type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Load Mental Form</button>
+          <button type="button" class="rounded-xl border-2 border-black bg-white px-4 py-3 text-left text-sm font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Load Cyberbullying Form</button>
+          <button type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Load Physical Bullying Form</button>
+          <button id="transferButton" type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Transfer</button>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" class="aspect-square rounded-xl border-2 border-black bg-black p-3 text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Disconnect</button>
+            <button type="button" class="aspect-square rounded-xl border-2 border-black bg-white p-3 text-sm font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Disconnect and Flag</button>
+          </div>
+          <button type="button" class="h-20 rounded-xl border-2 border-black bg-white px-4 py-3 text-left text-sm font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Flag Message</button>
+          <button type="button" class="rounded-xl border-2 border-black bg-white px-4 py-3 text-left text-sm font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white">Ask an Admin</button>
+          <button id="dispatchButton" type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Dispatch</button>
+          <button id="authorizeMediaCenterButton" type="button" class="rounded-xl border-2 border-black bg-black px-4 py-3 text-left text-sm font-bold text-white dark:border-white dark:bg-white dark:text-black">Authorize Case for Media Center</button>
+        </div>
+      </section>
+      <section class="flex h-full min-h-0 w-2/3 flex-col overflow-hidden p-5" aria-label="Responder chat workspace">
+      <div id="chatMessages" class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain" aria-label="Chat messages"></div>
+      <div class="mt-4 flex items-end gap-3">
+        <textarea id="chatComposer" rows="1" class="min-h-14 flex-1 resize-none rounded-2xl border-2 border-slate-200 bg-white px-4 py-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white" placeholder="Start typing then click Send"></textarea>
+        <button id="sendChatButton" type="button" class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-black bg-black text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-white dark:bg-white dark:text-black" aria-label="Send message">
+          <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
     </main>
+  </section>
 
-    <!-- Spacer representing footer clearance -->
-    <div class="w-full h-8 bg-transparent"></div>
+  <script>
+/*!
+ * RoboMod v1.2.0 - drop-in content moderation checker (NO UI).
+ * Import it, call it. Checks ANY file (image / video / audio / PDF / text) against 195
+ * real moderation services and just answers: safe or not.
+ *
+ *   const RoboMod = require('robomod');    // CommonJS
+ *   import RoboMod from 'robomod';         // ESM
+ *
+ * Bundles the Robo File Moderator service data (real checks). Brand logos are
+ * trademarks of their respective owners.  MIT licensed.
+ */
 
-    <!-- Comprehensive Status Code database mapping -->
-    <script>
-        const httpErrorDatabase = {
-            400: { title: "Bad Request", desc: "The server could not understand the request due to malformed syntax." },
-            401: { title: "Unauthorized", desc: "The request requires user authentication." },
-            402: { title: "Payment Required", desc: "Reserved for future utilization." },
-            403: { title: "Forbidden", desc: "The server understood the request but refuses to authorize it." },
-            404: { title: "Not Found", desc: "The server cannot find the requested resource. This link is broken or does not exist." },
-            405: { title: "Method Not Allowed", desc: "The request method is known by the server but is not supported." },
-            406: { title: "Not Acceptable", desc: "The web server cannot produce responses matching accepted parameters." },
-            407: { title: "Proxy Authentication Required", desc: "Authentication must first be completed through the proxy." },
-            408: { title: "Request Timeout", desc: "The server timed out waiting for the incoming request." },
-            409: { title: "Conflict", desc: "The request could not be completed due to a state conflict." },
-            410: { title: "Gone", desc: "The requested resource is no longer available and has been permanently removed." },
-            411: { title: "Length Required", desc: "The request was rejected because it did not specify the required content length." },
-            412: { title: "Precondition Failed", desc: "One or more conditions specified in the request headers evaluated to false." },
-            413: { title: "Payload Too Large", desc: "The request entity is larger than limits defined by the server." },
-            414: { title: "URI Too Long", desc: "The request URI is longer than the server is willing to interpret." },
-            415: { title: "Unsupported Media Type", desc: "The media format of requested data is not supported." },
-            416: { title: "Range Not Satisfiable", desc: "The range specified by the request cannot be fulfilled." },
-            417: { title: "Expectation Failed", desc: "The expectation given in the Expect request-header field could not be met." },
-            418: { title: "I'm a Teapot", desc: "The server refuses the attempt to brew coffee with a teapot." },
-            421: { title: "Misdirected Request", desc: "The request was directed at a server that is not able to produce a response." },
-            422: { title: "Unprocessable Content", desc: "The request was well-formed but was unable to be followed due to semantic errors." },
-            423: { title: "Locked", desc: "The resource that is being accessed is currently locked." },
-            424: { title: "Failed Dependency", desc: "The request failed because it depended on another action which failed." },
-            425: { title: "Too Early", desc: "The server is unwilling to risk processing a request that might be replayed." },
-            426: { title: "Upgrade Required", desc: "The server refuses to perform the request using the current protocol." },
-            428: { title: "Precondition Required", desc: "The origin server requires the request to be conditional to prevent conflicts." },
-            429: { title: "Too Many Requests", desc: "The user has sent too many requests in a given amount of time." },
-            431: { title: "Request Header Fields Too Large", desc: "The server is unwilling to process the request because header fields are too large." },
-            451: { title: "Unavailable For Legal Reasons", desc: "The server is denying access as a consequence of legal demands." },
-            500: { title: "Internal Server Error", desc: "The server encountered an unexpected condition that prevented it from fulfilling the request." },
-            501: { title: "Not Implemented", desc: "The server does not support the functionality required to fulfill the request." },
-            502: { title: "Bad Gateway", desc: "The server received an invalid response from upstream." },
-            503: { title: "Service Unavailable", desc: "The server is temporarily unable to handle the request due to maintenance." },
-            504: { title: "Gateway Timeout", desc: "The server did not receive a timely response from an upstream server." },
-            505: { title: "HTTP Version Not Supported", desc: "The server does not support the HTTP protocol version used in the request." },
-            506: { title: "Variant Also Negotiates", desc: "Transparent content negotiation results in a circular reference." },
-            507: { title: "Insufficient Storage", desc: "The server is unable to store the representation needed to complete the request." },
-            508: { title: "Loop Detected", desc: "The server terminated an operation because it encountered an infinite loop." },
-            510: { title: "Not Extended", desc: "Further extensions to the request are required for the server to fulfill it." },
-            511: { title: "Network Authentication Required", desc: "The client needs to authenticate to gain network access." }
-        };
-    </script>
+var RoboModFactory = (function () {
+  'use strict';
 
-    <!-- Core Interactive Logic & Particle Assembly Animation Engine -->
-    <script>
-        // Setup state observers on window.ErrorStatus to track dynamic code adjustments
-        let _errorStatus = "403";
-        Object.defineProperty(window, 'ErrorStatus', {
-            get: function() { return _errorStatus; },
-            set: function(val) {
-                const parsed = parseInt(val, 10);
-                if (!isNaN(parsed) && parsed >= 400 && parsed <= 599) {
-                    _errorStatus = parsed.toString();
-                    const el = document.getElementById('ErrorStatus');
-                    if (el) el.textContent = _errorStatus;
-                    const codeEl = document.getElementById('resolved-code');
-                    if (codeEl && codeEl.textContent !== _errorStatus) {
-                        codeEl.textContent = _errorStatus;
-                    }
-                    triggerSimulation();
-                }
-            }
+  var VERSION = '1.2.0';
+  var DEFAULTS = { maxPdfPages: 30 };
+
+  var GROUPS = [
+    { id: 'ai',          label: 'Frontier AI Models' },
+    { id: 'social',      label: 'Social Media' },
+    { id: 'gaming',      label: 'Gaming Engines' },
+    { id: 'cloud',       label: 'Cloud Enterprise APIs' },
+    { id: 'specialized', label: 'Specialized Safety APIs' },
+    { id: 'models',      label: 'Open-Source Safety Models' }
+  ];
+
+  var BRAND = {"services":[{"name":"OpenAI GPT-4o Vision Safety","company":"OpenAI","group":"ai","checks":[{"n":"Sexual (explicit) \u2014 Moderation API","s":"porn","t":0.5,"d":"OpenAI omni-moderation category 'sexual' \u2014 explicit sexual content"},{"n":"Sexual (minors) \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'sexual/minors' \u2014 CSAM (no local signal; requires hash matching)"},{"n":"Violence \u2014 Moderation API","s":"violence","t":0.5,"d":"OpenAI category 'violence' \u2014 depiction of physical harm"},{"n":"Violence (graphic) \u2014 Moderation API","s":"violence","t":0.5,"d":"OpenAI category 'violence/graphic' \u2014 gore and graphic injury"},{"n":"Hate \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'hate' \u2014 hateful content (text-level; not measurable by visual engine)"},{"n":"Hate (threatening) \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'hate/threatening'"},{"n":"Harassment \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'harassment'"},{"n":"Harassment (threatening) \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'harassment/threatening'"},{"n":"Self-harm \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'self-harm' \u2014 self-injury content"},{"n":"Self-harm (intent) \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'self-harm/intent'"},{"n":"Self-harm (instructions) \u2014 Moderation API","s":null,"t":null,"d":"OpenAI category 'self-harm/instructions'"}]},{"name":"Google Gemini Safety","company":"Google","group":"ai","checks":[{"n":"HARM_CATEGORY_SEXUALLY_EXPLICIT","s":"porn","t":0.5,"d":"Gemini safety setting for explicit/adult imagery"},{"n":"HARM_CATEGORY_DANGEROUS_CONTENT","s":"violence","t":0.5,"d":"Gemini safety setting for weapons, violence and dangerous acts"},{"n":"HARM_CATEGORY_HATE_SPEECH","s":null,"t":null,"d":"Gemini safety setting for hate speech (text-level)"},{"n":"HARM_CATEGORY_HARASSMENT","s":null,"t":null,"d":"Gemini safety setting for harassment (text-level)"}]},{"name":"Anthropic Claude Safety","company":"Anthropic","group":"ai","checks":[{"n":"Sexually explicit content","s":"porn","t":0.5,"d":"Anthropic Usage Policy \u2014 adult/explicit imagery"},{"n":"Child sexual abuse material","s":null,"t":null,"d":"Anthropic Usage Policy \u2014 CSAM (zero tolerance)"},{"n":"Violence & weapons","s":"violence","t":0.5,"d":"Anthropic Usage Policy \u2014 graphic violence and weapons"},{"n":"Hate & discrimination","s":null,"t":null,"d":"Anthropic Usage Policy \u2014 hateful or discriminatory content"},{"n":"Harassment & abuse","s":null,"t":null,"d":"Anthropic Usage Policy \u2014 harassment"},{"n":"Self-harm","s":null,"t":null,"d":"Anthropic Usage Policy \u2014 self-harm content"},{"n":"Illegal activity","s":null,"t":null,"d":"Anthropic Usage Policy \u2014 facilitation of illegal acts"}]},{"name":"Meta Llama Guard 3","company":"Meta","group":"ai","checks":[{"n":"S1 Violent Crimes","s":"violence","t":0.5,"d":"Llama Guard taxonomy \u2014 violent crimes and bodily harm"},{"n":"S2 Non-Violent Crimes","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 theft, fraud, property crime"},{"n":"S3 Sex-Related Crimes","s":"porn","t":0.5,"d":"Llama Guard taxonomy \u2014 sex-related offenses"},{"n":"S4 Child Sexual Exploitation","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 CSAM and child grooming"},{"n":"S5 Defamation","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 defamatory statements"},{"n":"S6 Specialized Advice","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 unqualified medical/legal/financial advice"},{"n":"S7 Privacy","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 privacy violations"},{"n":"S8 Intellectual Property","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 IP infringement"},{"n":"S9 Indiscriminate Weapons","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 WMD and chemical/biological weapons"},{"n":"S10 Hate","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 hate speech"},{"n":"S11 Suicide & Self-Harm","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 self-harm and suicide content"},{"n":"S12 Sexual Content","s":"porn","t":0.5,"d":"Llama Guard taxonomy \u2014 sexual content"},{"n":"S13 Elections","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 election interference"},{"n":"S14 Code Interpreter Abuse","s":null,"t":null,"d":"Llama Guard taxonomy \u2014 code interpreter abuse"}]},{"name":"Mistral Pixtral & Mistral Guard","company":"Mistral AI","group":"ai","checks":[{"n":"Sexual content","s":"porn","t":0.5,"d":"Mistral Guard \u2014 explicit sexual content"},{"n":"Violence","s":"violence","t":0.5,"d":"Mistral Guard \u2014 violent content"},{"n":"Hate & discrimination","s":null,"t":null,"d":"Mistral Guard \u2014 hate speech"},{"n":"Harassment","s":null,"t":null,"d":"Mistral Guard \u2014 harassment"},{"n":"Self-harm","s":null,"t":null,"d":"Mistral Guard \u2014 self-harm"},{"n":"Child safety","s":null,"t":null,"d":"Mistral Guard \u2014 child exploitation"}]},{"name":"Cohere Command R+ Safety","company":"Cohere","group":"ai","checks":[{"n":"Sexual content","s":"porn","t":0.5,"d":"Cohere moderation classifier \u2014 explicit content"},{"n":"Violence","s":"violence","t":0.5,"d":"Cohere moderation classifier \u2014 violent content"},{"n":"Toxicity","s":null,"t":null,"d":"Cohere moderation classifier \u2014 toxic language"},{"n":"Hate speech","s":null,"t":null,"d":"Cohere moderation classifier \u2014 hate speech"}]},{"name":"DeepSeek Safety Engine","company":"DeepSeek","group":"ai","checks":[{"n":"Sexual content","s":"porn","t":0.5,"d":"DeepSeek compliance filter \u2014 explicit content"},{"n":"Violence","s":"violence","t":0.5,"d":"DeepSeek compliance filter \u2014 violent content"},{"n":"Hate & discrimination","s":null,"t":null,"d":"DeepSeek compliance filter \u2014 hate speech"},{"n":"Illegal acts","s":null,"t":null,"d":"DeepSeek compliance filter \u2014 illegal activity"},{"n":"Self-harm","s":null,"t":null,"d":"DeepSeek compliance filter \u2014 self-harm"}]},{"name":"xAI Grok Safety","company":"xAI","group":"ai","checks":[{"n":"Sexual content","s":"porn","t":0.5,"d":"Grok safety guard \u2014 explicit content"},{"n":"Violence","s":"violence","t":0.5,"d":"Grok safety guard \u2014 violent content"},{"n":"Hate & harassment","s":null,"t":null,"d":"Grok safety guard \u2014 hateful/harassing content"},{"n":"Illegal activity","s":null,"t":null,"d":"Grok safety guard \u2014 illegal activity"}]},{"name":"YouTube Content Safety","company":"YouTube (Google)","group":"social","checks":[{"n":"Nudity & sexual content","s":"porn","t":0.5,"d":"YouTube Community Guidelines \u2014 explicit nudity and sexual content"},{"n":"Violent or graphic content","s":"violence","t":0.5,"d":"YouTube Community Guidelines \u2014 violent or graphic imagery"},{"n":"Child safety","s":null,"t":null,"d":"YouTube Community Guidelines \u2014 minor safety"},{"n":"Harassment & cyberbullying","s":null,"t":null,"d":"YouTube Community Guidelines"},{"n":"Hate speech","s":null,"t":null,"d":"YouTube Community Guidelines"},{"n":"Dangerous content & challenges","s":null,"t":null,"d":"YouTube Community Guidelines \u2014 dangerous acts"},{"n":"Spam, deceptive practices & scams","s":null,"t":null,"d":"YouTube Community Guidelines"},{"n":"Impersonation","s":null,"t":null,"d":"YouTube Community Guidelines"},{"n":"Regulated goods (firearms, drugs)","s":null,"t":null,"d":"YouTube Community Guidelines"},{"n":"Medical misinformation","s":null,"t":null,"d":"YouTube Medical Misinformation Policy"}]},{"name":"TikTok Safety Engine","company":"TikTok (ByteDance)","group":"social","checks":[{"n":"Nudity & body exposure","s":"porn","t":0.5,"d":"TikTok Community Guidelines \u2014 nudity and body exposure"},{"n":"Sexual activity & services","s":null,"t":null,"d":"TikTok Community Guidelines \u2014 sexual activity"},{"n":"Violent & graphic content","s":"violence","t":0.5,"d":"TikTok Community Guidelines \u2014 violent and graphic content"},{"n":"Minor safety","s":null,"t":null,"d":"TikTok Community Guidelines \u2014 minor safety"},{"n":"Suicide & self-harm","s":null,"t":null,"d":"TikTok Community Guidelines"},{"n":"Dangerous activities & challenges","s":null,"t":null,"d":"TikTok Community Guidelines"},{"n":"Hate speech & hateful behavior","s":null,"t":null,"d":"TikTok Community Guidelines"},{"n":"Harassment & bullying","s":null,"t":null,"d":"TikTok Community Guidelines"},{"n":"Regulated goods & weapons","s":null,"t":null,"d":"TikTok Community Guidelines"}]},{"name":"Instagram Safety Guard","company":"Instagram (Meta)","group":"social","checks":[{"n":"Adult nudity & sexual activity","s":"porn","t":0.5,"d":"Meta Community Standards \u2014 adult nudity"},{"n":"Sexual solicitation","s":null,"t":null,"d":"Meta Community Standards \u2014 sexual solicitation"},{"n":"Violent & graphic content","s":"violence","t":0.5,"d":"Meta Community Standards \u2014 violence"},{"n":"Suicide & self-injury","s":null,"t":null,"d":"Meta Community Standards"},{"n":"Child sexual exploitation","s":null,"t":null,"d":"Meta Community Standards \u2014 CSAM"},{"n":"Hate speech","s":null,"t":null,"d":"Meta Community Standards"},{"n":"Bullying & harassment","s":null,"t":null,"d":"Meta Community Standards"},{"n":"Regulated goods","s":null,"t":null,"d":"Meta Community Standards \u2014 firearms/drugs"}]},{"name":"Facebook Community Shield","company":"Facebook (Meta)","group":"social","checks":[{"n":"Adult nudity & sexual activity","s":"porn","t":0.5,"d":"Meta Community Standards \u2014 adult nudity"},{"n":"Sexual solicitation","s":null,"t":null,"d":"Meta Community Standards"},{"n":"Violent & graphic content","s":"violence","t":0.5,"d":"Meta Community Standards \u2014 violence"},{"n":"Suicide & self-injury","s":null,"t":null,"d":"Meta Community Standards"},{"n":"Child sexual exploitation","s":null,"t":null,"d":"Meta Community Standards \u2014 CSAM"},{"n":"Hate speech","s":null,"t":null,"d":"Meta Community Standards"},{"n":"Bullying & harassment","s":null,"t":null,"d":"Meta Community Standards"},{"n":"Dangerous individuals & organizations","s":null,"t":null,"d":"Meta Community Standards"}]},{"name":"X (Twitter) Media Safety","company":"X Corp.","group":"social","checks":[{"n":"Adult content (sensitive media)","s":"porn","t":0.5,"d":"X Sensitive Media Policy \u2014 adult content labeling"},{"n":"Violent & hateful media","s":"violence","t":0.5,"d":"X Sensitive Media Policy \u2014 graphic violence"},{"n":"Child sexual exploitation","s":null,"t":null,"d":"X rules \u2014 CSAM"},{"n":"Hateful conduct","s":null,"t":null,"d":"X rules \u2014 hateful conduct"},{"n":"Harassment & abuse","s":null,"t":null,"d":"X rules"},{"n":"Suicide & self-harm","s":null,"t":null,"d":"X rules"},{"n":"Violent speech & glorification","s":"violence","t":0.5,"d":"X rules \u2014 violent content"}]},{"name":"Twitch Live Shield","company":"Twitch (Amazon)","group":"social","checks":[{"n":"Nudity & attire","s":"porn","t":0.5,"d":"Twitch Community Guidelines \u2014 nudity and attire"},{"n":"Sexual content & services","s":null,"t":null,"d":"Twitch Community Guidelines \u2014 sexual content"},{"n":"Violence & gore","s":"violence","t":0.5,"d":"Twitch Community Guidelines \u2014 violence and gore"},{"n":"Hateful conduct","s":null,"t":null,"d":"Twitch Community Guidelines"},{"n":"Harassment","s":null,"t":null,"d":"Twitch Community Guidelines"},{"n":"Self-destructive behavior","s":null,"t":null,"d":"Twitch Community Guidelines"},{"n":"Illegal activity","s":null,"t":null,"d":"Twitch Community Guidelines"}]},{"name":"Discord AutoMod","company":"Discord","group":"social","checks":[{"n":"Sexual content (NSFW)","s":"porn","t":0.5,"d":"Discord Community Guidelines \u2014 adult content"},{"n":"Violent & graphic content","s":"violence","t":0.5,"d":"Discord Community Guidelines \u2014 graphic violence"},{"n":"Child sexual abuse material","s":null,"t":null,"d":"Discord Community Guidelines \u2014 CSAM"},{"n":"Hate speech","s":null,"t":null,"d":"Discord Community Guidelines"},{"n":"Harassment & bullying","s":null,"t":null,"d":"Discord Community Guidelines"},{"n":"Self-harm","s":null,"t":null,"d":"Discord Community Guidelines"},{"n":"AutoMod: sexually explicit language","s":null,"t":null,"d":"Discord AutoMod keyword filter"},{"n":"AutoMod: insults & slurs","s":null,"t":null,"d":"Discord AutoMod keyword filter"}]},{"name":"Snapchat Story Moderation","company":"Snap Inc.","group":"social","checks":[{"n":"Sexual content","s":"porn","t":0.5,"d":"Snapchat Community Guidelines \u2014 sexual content"},{"n":"Violent & graphic content","s":"violence","t":0.5,"d":"Snapchat Community Guidelines \u2014 graphic content"},{"n":"Hate speech","s":null,"t":null,"d":"Snapchat Community Guidelines"},{"n":"Harassment & bullying","s":null,"t":null,"d":"Snapchat Community Guidelines"},{"n":"Self-harm","s":null,"t":null,"d":"Snapchat Community Guidelines"},{"n":"Dangerous activities","s":null,"t":null,"d":"Snapchat Community Guidelines"}]},{"name":"Reddit AutoModerator","company":"Reddit","group":"social","checks":[{"n":"Sexual or suggestive content (NSFW)","s":"porn","t":0.5,"d":"Reddit Content Policy \u2014 NSFW tagging"},{"n":"Sexual content involving minors","s":null,"t":null,"d":"Reddit Content Policy \u2014 CSAM"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Reddit Content Policy \u2014 graphic violence"},{"n":"Involuntary pornography","s":null,"t":null,"d":"Reddit Content Policy"},{"n":"Hate","s":null,"t":null,"d":"Reddit Content Policy"},{"n":"Harassment","s":null,"t":null,"d":"Reddit Content Policy"},{"n":"Impersonation","s":null,"t":null,"d":"Reddit Content Policy"}]},{"name":"Pinterest Visual Safety","company":"Pinterest","group":"social","checks":[{"n":"Adult content & nudity","s":"porn","t":0.5,"d":"Pinterest Community Guidelines \u2014 adult content"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Pinterest Community Guidelines \u2014 graphic content"},{"n":"Self-harm","s":null,"t":null,"d":"Pinterest Community Guidelines"},{"n":"Hate speech","s":null,"t":null,"d":"Pinterest Community Guidelines"},{"n":"Regulated goods","s":null,"t":null,"d":"Pinterest Community Guidelines"}]},{"name":"LinkedIn Professional Filter","company":"LinkedIn (Microsoft)","group":"social","checks":[{"n":"Nudity & sexual content","s":"porn","t":0.5,"d":"LinkedIn Professional Community Policies"},{"n":"Violence & graphic content","s":"violence","t":0.5,"d":"LinkedIn Professional Community Policies"},{"n":"Hate speech","s":null,"t":null,"d":"LinkedIn Professional Community Policies"},{"n":"Harassment","s":null,"t":null,"d":"LinkedIn Professional Community Policies"},{"n":"Illegal & regulated goods","s":null,"t":null,"d":"LinkedIn Professional Community Policies"}]},{"name":"Steam Community Guard","company":"Steam (Valve)","group":"social","checks":[{"n":"Pornographic content","s":"porn","t":0.5,"d":"Steam Community Rules \u2014 pornographic content"},{"n":"Gore & graphic violence","s":"violence","t":0.5,"d":"Steam Community Rules \u2014 gore"},{"n":"Hate speech","s":null,"t":null,"d":"Steam Community Rules"},{"n":"Harassment","s":null,"t":null,"d":"Steam Community Rules"},{"n":"Child exploitation","s":null,"t":null,"d":"Steam Community Rules"}]},{"name":"Spotify Podcast & Cover Guard","company":"Spotify","group":"social","checks":[{"n":"Explicit cover art / pornography","s":"porn","t":0.5,"d":"Spotify Platform Rules \u2014 explicit imagery"},{"n":"Violent / graphic imagery","s":"violence","t":0.5,"d":"Spotify Platform Rules \u2014 graphic imagery"},{"n":"Hate content","s":null,"t":null,"d":"Spotify Platform Rules"},{"n":"Harassment","s":null,"t":null,"d":"Spotify Platform Rules"}]},{"name":"Apple App Store Media Shield","company":"Apple","group":"social","checks":[{"n":"Sexually explicit content (1.1)","s":"porn","t":0.5,"d":"App Store Review Guidelines 1.1 \u2014 objectionable content"},{"n":"Violent content (1.4)","s":"violence","t":0.5,"d":"App Store Review Guidelines 1.4 \u2014 physical harm"},{"n":"Child sexual abuse material","s":null,"t":null,"d":"App Review \u2014 CSAM screening"},{"n":"Hate speech","s":null,"t":null,"d":"App Store Review Guidelines"}]},{"name":"Google Play Store Guard","company":"Google","group":"social","checks":[{"n":"Sexual content & profanity","s":"porn","t":0.5,"d":"Google Play Policy \u2014 sexual content"},{"n":"Violence & gore","s":"violence","t":0.5,"d":"Google Play Policy \u2014 graphic violence"},{"n":"Child endangerment","s":null,"t":null,"d":"Google Play Policy"},{"n":"Hate speech","s":null,"t":null,"d":"Google Play Policy"},{"n":"Bullying & harassment","s":null,"t":null,"d":"Google Play Policy"}]},{"name":"Netflix Media Quality & Safety","company":"Netflix","group":"social","checks":[{"n":"Maturity rating \u2014 nudity","s":"porn","t":0.5,"d":"Netflix maturity ratings \u2014 nudity"},{"n":"Maturity rating \u2014 sexual content","s":"porn","t":0.5,"d":"Netflix maturity ratings \u2014 sex"},{"n":"Maturity rating \u2014 violence","s":"violence","t":0.5,"d":"Netflix maturity ratings \u2014 violence"},{"n":"Maturity rating \u2014 gore","s":"violence","t":0.5,"d":"Netflix maturity ratings \u2014 gore"}]},{"name":"Kick Streaming Guard","company":"Kick","group":"social","checks":[{"n":"Nudity & sexual content","s":"porn","t":0.5,"d":"Kick Community Guidelines"},{"n":"Violence & gore","s":"violence","t":0.5,"d":"Kick Community Guidelines"},{"n":"Hate & harassment","s":null,"t":null,"d":"Kick Community Guidelines"},{"n":"Self-harm","s":null,"t":null,"d":"Kick Community Guidelines"}]},{"name":"Patreon Creator Safety","company":"Patreon","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Patreon Community Guidelines"},{"n":"Violence & gore","s":"violence","t":0.5,"d":"Patreon Community Guidelines"},{"n":"Hate speech","s":null,"t":null,"d":"Patreon Community Guidelines"},{"n":"Child sexual abuse material","s":null,"t":null,"d":"Patreon Community Guidelines"}]},{"name":"WhatsApp Media Safety","company":"WhatsApp (Meta)","group":"social","checks":[{"n":"CSAM detection (upload hashing)","s":null,"t":null,"d":"WhatsApp uploads are hashed against CSAM databases"},{"n":"Reported media \u2014 nudity","s":"porn","t":0.5,"d":"User-reported attachment review"}]},{"name":"Telegram Media Filter","company":"Telegram","group":"social","checks":[{"n":"Public channel NSFW content","s":"porn","t":0.5,"d":"Telegram ToS \u2014 public NSFW restrictions"},{"n":"Child sexual abuse material","s":null,"t":null,"d":"Telegram ToS \u2014 CSAM prohibition"},{"n":"Violence","s":"violence","t":0.5,"d":"Telegram ToS \u2014 graphic violence"}]},{"name":"Threads Content Guard","company":"Threads (Meta)","group":"social","checks":[{"n":"Adult nudity","s":"porn","t":0.5,"d":"Threads (Instagram) Community Guidelines"},{"n":"Violent & graphic content","s":"violence","t":0.5,"d":"Threads (Instagram) Community Guidelines"},{"n":"Hate speech","s":null,"t":null,"d":"Threads (Instagram) Community Guidelines"},{"n":"Harassment","s":null,"t":null,"d":"Threads (Instagram) Community Guidelines"}]},{"name":"Mastodon Instance Filter","company":"Mastodon","group":"social","checks":[{"n":"Explicit sexual content","s":"porn","t":0.5,"d":"Mastodon server rules \u2014 explicit content"},{"n":"Violent / graphic content","s":"violence","t":0.5,"d":"Mastodon server rules"},{"n":"Hate speech","s":null,"t":null,"d":"Mastodon server rules"},{"n":"Harassment","s":null,"t":null,"d":"Mastodon server rules"}]},{"name":"Messenger Media Guard","company":"Messenger (Meta)","group":"social","checks":[{"n":"Adult nudity","s":"porn","t":0.5,"d":"Messenger (Meta) Community Standards"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Messenger (Meta) Community Standards"},{"n":"Child exploitation","s":null,"t":null,"d":"Messenger (Meta) Community Standards"}]},{"name":"WeChat Content Moderation","company":"WeChat (Tencent)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"WeChat content rules"},{"n":"Violence","s":"violence","t":0.5,"d":"WeChat content rules"},{"n":"Sensitive political content","s":null,"t":null,"d":"WeChat content rules"},{"n":"Gambling & illegal content","s":null,"t":null,"d":"WeChat content rules"}]},{"name":"LINE Media Shield","company":"LINE (LY Corp.)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"LINE Terms & Guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"LINE Terms & Guidelines"},{"n":"Illegal content","s":null,"t":null,"d":"LINE Terms & Guidelines"}]},{"name":"Viber Media Scanner","company":"Viber (Rakuten)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Viber Community Policies"},{"n":"Violence","s":"violence","t":0.5,"d":"Viber Community Policies"},{"n":"Hate speech","s":null,"t":null,"d":"Viber Community Policies"}]},{"name":"BeReal RealTime Moderation","company":"BeReal","group":"social","checks":[{"n":"Nudity","s":"porn","t":0.5,"d":"BeReal Terms \u2014 nudity prohibition"},{"n":"Violence","s":"violence","t":0.5,"d":"BeReal Terms"}]},{"name":"Medium Publication Guard","company":"Medium","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Medium Rules"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Medium Rules"},{"n":"Hate speech","s":null,"t":null,"d":"Medium Rules"}]},{"name":"Substack Media Filter","company":"Substack","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Substack Content Guidelines"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Substack Content Guidelines"},{"n":"Hate speech","s":null,"t":null,"d":"Substack Content Guidelines"}]},{"name":"Vimeo Quality & Safety","company":"Vimeo","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Vimeo Acceptable Use Policy"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Vimeo Acceptable Use Policy"},{"n":"Hate content","s":null,"t":null,"d":"Vimeo Acceptable Use Policy"}]},{"name":"Dailymotion Video Guard","company":"Dailymotion","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Dailymotion prohibited content"},{"n":"Violence","s":"violence","t":0.5,"d":"Dailymotion prohibited content"}]},{"name":"Rumble Video Safety","company":"Rumble","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Rumble content policy"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Rumble content policy"}]},{"name":"Bluesky Social Safety","company":"Bluesky","group":"social","checks":[{"n":"Adult content (labeling)","s":"porn","t":0.5,"d":"Bluesky Community Guidelines \u2014 adult content"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"Bluesky Community Guidelines"},{"n":"Hate speech","s":null,"t":null,"d":"Bluesky Community Guidelines"}]},{"name":"Signal Attachment Guard","company":"Signal Foundation","group":"social","checks":[{"n":"Content scanning (E2EE)","s":null,"t":null,"d":"Signal does not scan content (end-to-end encrypted)"},{"n":"Profile/attachment CSAM reports","s":null,"t":null,"d":"User reports only \u2014 no automated media scan"}]},{"name":"SoundCloud Audio Safety","company":"SoundCloud","group":"social","checks":[{"n":"Explicit cover art","s":"porn","t":0.5,"d":"SoundCloud Community Guidelines"},{"n":"Graphic violence","s":"violence","t":0.5,"d":"SoundCloud Community Guidelines"},{"n":"Hate content","s":null,"t":null,"d":"SoundCloud Community Guidelines"}]},{"name":"OnlyFans Content Safety","company":"OnlyFans (Fenix Intl)","group":"social","checks":[{"n":"Child sexual abuse material","s":null,"t":null,"d":"OnlyFans Acceptable Use \u2014 CSAM"},{"n":"Non-consensual content","s":null,"t":null,"d":"OnlyFans Acceptable Use"},{"n":"Illegal content","s":null,"t":null,"d":"OnlyFans Acceptable Use"}]},{"name":"Kuaishou Video Guard","company":"Kuaishou","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Kuaishou community standards"},{"n":"Violence & gore","s":"violence","t":0.5,"d":"Kuaishou community standards"},{"n":"Vulgar content","s":"sexy","t":0.6,"d":"Kuaishou community standards"}]},{"name":"Douyin Content Safety","company":"Douyin (ByteDance)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Douyin community standards"},{"n":"Violence","s":"violence","t":0.5,"d":"Douyin community standards"},{"n":"Vulgar content","s":"sexy","t":0.6,"d":"Douyin community standards"}]},{"name":"Bilibili Video Moderation","company":"Bilibili","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Bilibili community rules"},{"n":"Violence & gore","s":"violence","t":0.5,"d":"Bilibili community rules"},{"n":"Vulgar content","s":"sexy","t":0.6,"d":"Bilibili community rules"}]},{"name":"Youku Safety Shield","company":"Youku (Alibaba)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Youku content rules"},{"n":"Violence","s":"violence","t":0.5,"d":"Youku content rules"}]},{"name":"iQIYI Content Scanner","company":"iQIYI (Baidu)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"iQIYI content rules"},{"n":"Violence","s":"violence","t":0.5,"d":"iQIYI content rules"}]},{"name":"VKontakte Media Guard","company":"VK","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"VK content rules"},{"n":"Violence","s":"violence","t":0.5,"d":"VK content rules"},{"n":"Extremism","s":null,"t":null,"d":"VK content rules"}]},{"name":"Odnoklassniki Moderation","company":"Odnoklassniki (VK)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Odnoklassniki rules"},{"n":"Violence","s":"violence","t":0.5,"d":"Odnoklassniki rules"}]},{"name":"RUTUBE Video Inspector","company":"Rutube (Gazprom-Media)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Rutube content rules"},{"n":"Violence","s":"violence","t":0.5,"d":"Rutube content rules"}]},{"name":"Kwai Video Safety","company":"Kwai (Kuaishou)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Kwai community standards"},{"n":"Violence","s":"violence","t":0.5,"d":"Kwai community standards"}]},{"name":"Plurk Media Scanner","company":"Plurk","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Plurk terms of service"}]},{"name":"Mixi Content Guard","company":"Mixi","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Mixi terms of service"}]},{"name":"Minds Media Inspector","company":"Minds","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Minds content policy"},{"n":"Violence","s":"violence","t":0.5,"d":"Minds content policy"}]},{"name":"KakaoTalk Safety Engine","company":"Kakao","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"KakaoTalk terms"},{"n":"Illegal content","s":null,"t":null,"d":"KakaoTalk terms"}]},{"name":"Zalo Media Filter","company":"Zalo (VNG)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Zalo content rules"},{"n":"Violence","s":"violence","t":0.5,"d":"Zalo content rules"}]},{"name":"ShareChat Media Guard","company":"ShareChat (Mohalla Tech)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"ShareChat community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"ShareChat community guidelines"},{"n":"Vulgar content","s":"sexy","t":0.6,"d":"ShareChat community guidelines"}]},{"name":"Koo Social Shield","company":"Koo (Bombinate)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Koo community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Koo community guidelines"}]},{"name":"Tantan Dating Guard","company":"Tantan (Hello Group)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Tantan community rules"}]},{"name":"Soul App Safety","company":"Soul App","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Soul App community rules"},{"n":"Vulgar content","s":"sexy","t":0.6,"d":"Soul App community rules"}]},{"name":"Smule Karaoke Shield","company":"Smule","group":"social","checks":[{"n":"Explicit cover/avatar","s":"porn","t":0.5,"d":"Smule community guidelines"}]},{"name":"StarMaker Audio Guard","company":"StarMaker (Skymoons)","group":"social","checks":[{"n":"Explicit content","s":"porn","t":0.5,"d":"StarMaker community rules"}]},{"name":"Ultimate Guitar Media Shield","company":"Muse Group","group":"social","checks":[{"n":"Explicit imagery","s":"porn","t":0.5,"d":"Ultimate Guitar community rules"}]},{"name":"Nextdoor Local Guard","company":"Nextdoor","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Nextdoor community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Nextdoor community guidelines"}]},{"name":"Dailyhunt News Safety","company":"Dailyhunt (VerSe)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Dailyhunt content guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Dailyhunt content guidelines"}]},{"name":"Yubo Youth Safety Guard","company":"Yubo","group":"social","checks":[{"n":"Nudity","s":"porn","t":0.5,"d":"Yubo community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Yubo community guidelines"},{"n":"Minor safety","s":null,"t":null,"d":"Yubo age-gating and minor safety"}]},{"name":"Amino Community Shield","company":"Amino (MediaLab)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Amino community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Amino community guidelines"}]},{"name":"Whisper Media Guard","company":"Whisper","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Whisper content policy"}]},{"name":"YikYak Local Filter","company":"Yik Yak","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Yik Yak community guardrails"}]},{"name":"Jodel Local Safety Guard","company":"Jodel","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Jodel community rules"}]},{"name":"ASKfm Media Inspector","company":"ASKfm","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"ASKfm community guidelines"},{"n":"Bullying","s":null,"t":null,"d":"ASKfm anti-bullying policy"}]},{"name":"Tellonym Content Guard","company":"Tellonym","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Tellonym community rules"},{"n":"Bullying","s":null,"t":null,"d":"Tellonym anti-bullying policy"}]},{"name":"Gettr Media Shield","company":"GETTR","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"GETTR terms of service"},{"n":"Violence","s":"violence","t":0.5,"d":"GETTR terms of service"}]},{"name":"Truth Social AutoMod","company":"Truth Social (TMTG)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Truth Social terms of service"},{"n":"Violence","s":"violence","t":0.5,"d":"Truth Social terms of service"}]},{"name":"Parler Content Guard","company":"Parler","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Parler community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Parler community guidelines"}]},{"name":"MeWe Media Filter","company":"MeWe (Sgrouples)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"MeWe terms of service"},{"n":"Violence","s":"violence","t":0.5,"d":"MeWe terms of service"}]},{"name":"Gab Social Safety Filter","company":"Gab","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Gab community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Gab community guidelines"}]},{"name":"Clubhouse Audio Guard","company":"Clubhouse","group":"social","checks":[{"n":"Harassment (audio)","s":null,"t":null,"d":"Clubhouse community guidelines (audio-level)"}]},{"name":"Triller Video Guard","company":"Triller","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Triller community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Triller community guidelines"}]},{"name":"Likee Safety Engine","company":"Likee (BIGO)","group":"social","checks":[{"n":"Pornography","s":"porn","t":0.5,"d":"Likee community standards"},{"n":"Violence","s":"violence","t":0.5,"d":"Likee community standards"}]},{"name":"Chingari Video Guard","company":"Chingari","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Chingari community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Chingari community guidelines"}]},{"name":"Trovo Live Moderation","company":"Trovo (Tencent)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Trovo community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Trovo community guidelines"}]},{"name":"DLive Broadcast Safety","company":"DLive","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"DLive community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"DLive community guidelines"}]},{"name":"Lapse Photo Moderation","company":"Lapse","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Lapse community guidelines"}]},{"name":"Lemon8 Media Filter","company":"Lemon8 (ByteDance)","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Lemon8 community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Lemon8 community guidelines"}]},{"name":"Hive Social Moderation","company":"Hive Social","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Hive Social community guidelines"},{"n":"Violence","s":"violence","t":0.5,"d":"Hive Social community guidelines"}]},{"name":"Lemmy Instance Guard","company":"Lemmy","group":"social","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Lemmy instance rules"},{"n":"Hate speech","s":null,"t":null,"d":"Lemmy instance rules"}]},{"name":"Roblox Community Standards","company":"Roblox","group":"gaming","checks":[{"n":"Sexual content & nudity","s":"porn","t":0.5,"d":"Roblox Community Standards \u2014 sexual content"},{"n":"Violent content & gore","s":"violence","t":0.5,"d":"Roblox Community Standards \u2014 violent content"},{"n":"Inappropriate avatar/clothing","s":"sexy","t":0.6,"d":"Roblox Community Standards \u2014 avatar appearance"},{"n":"Child safety","s":null,"t":null,"d":"Roblox Community Standards \u2014 child safety"},{"n":"Hate speech","s":null,"t":null,"d":"Roblox Community Standards"}]},{"name":"Epic Games Asset Safety Guard","company":"Epic Games","group":"gaming","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Epic Games content guidelines"},{"n":"Gore","s":"violence","t":0.5,"d":"Epic Games content guidelines"},{"n":"Child safety","s":null,"t":null,"d":"Epic Games content guidelines"}]},{"name":"Unity SafeVoice Audio Filter","company":"Unity","group":"gaming","checks":[{"n":"Voice chat (SafeVoice) toxicity","s":null,"t":null,"d":"Unity SafeVoice audio moderation (not measurable by image engine)"},{"n":"Asset adult content","s":"porn","t":0.5,"d":"Unity Asset Store content guidelines"}]},{"name":"Minecraft Realm Content Filter","company":"Minecraft (Mojang)","group":"gaming","checks":[{"n":"Custom skin nudity","s":"porn","t":0.5,"d":"Minecraft skin/username moderation"},{"n":"Custom skin gore","s":"violence","t":0.5,"d":"Minecraft skin/username moderation"},{"n":"Server chat/content","s":null,"t":null,"d":"Minecraft Realms moderation"}]},{"name":"EA Sports Fair Play Engine","company":"Electronic Arts","group":"gaming","checks":[{"n":"User-created crest/logo explicit","s":"porn","t":0.5,"d":"EA user-generated content rules"},{"n":"Gore","s":"violence","t":0.5,"d":"EA user-generated content rules"}]},{"name":"Ubisoft Player Safety Matrix","company":"Ubisoft","group":"gaming","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"Ubisoft code of conduct"},{"n":"Violence","s":"violence","t":0.5,"d":"Ubisoft code of conduct"}]},{"name":"Nintendo Online Child Safety","company":"Nintendo","group":"gaming","checks":[{"n":"User-generated content (levels/stages)","s":"porn","t":0.5,"d":"Nintendo online service guidelines"},{"n":"Child safety","s":null,"t":null,"d":"Nintendo parental controls"}]},{"name":"PlayStation Media Safety","company":"PlayStation (Sony)","group":"gaming","checks":[{"n":"Shared media adult content","s":"porn","t":0.5,"d":"PlayStation Network code of conduct"},{"n":"Chat moderation","s":null,"t":null,"d":"PlayStation Network code of conduct"}]},{"name":"Xbox Community Safety Engine","company":"Xbox (Microsoft)","group":"gaming","checks":[{"n":"Shared media adult content","s":"porn","t":0.5,"d":"Xbox community standards"},{"n":"Voice/text moderation","s":null,"t":null,"d":"Xbox community standards"}]},{"name":"Battle.net Player Safety","company":"Blizzard (Activision)","group":"gaming","checks":[{"n":"Player-uploaded media adult","s":"porn","t":0.5,"d":"Blizzard in-game code of conduct"},{"n":"Harassment","s":null,"t":null,"d":"Blizzard in-game code of conduct"}]},{"name":"Riot Games Player Safety Filter","company":"Riot Games","group":"gaming","checks":[{"n":"Player content adult","s":"porn","t":0.5,"d":"Riot Games player behavior systems"},{"n":"Voice moderation","s":null,"t":null,"d":"Riot Games voice evaluation"},{"n":"Harassment","s":null,"t":null,"d":"Riot Games player behavior systems"}]},{"name":"Niantic Wayfarer Asset Guard","company":"Niantic","group":"gaming","checks":[{"n":"POI photo adult content","s":"porn","t":0.5,"d":"Niantic Wayfarer review criteria"},{"n":"Gore","s":"violence","t":0.5,"d":"Niantic Wayfarer review criteria"}]},{"name":"GOG Community Guard","company":"GOG (CD Projekt)","group":"gaming","checks":[{"n":"Adult content","s":"porn","t":0.5,"d":"GOG community guidelines"},{"n":"Gore","s":"violence","t":0.5,"d":"GOG community guidelines"}]},{"name":"VRChat Avatar & World Guard","company":"VRChat","group":"gaming","checks":[{"n":"Avatar adult content","s":"porn","t":0.5,"d":"VRChat community guidelines"},{"n":"World gore","s":"violence","t":0.5,"d":"VRChat community guidelines"}]},{"name":"Rec Room World Content Filter","company":"Rec Room","group":"gaming","checks":[{"n":"User content adult","s":"porn","t":0.5,"d":"Rec Room code of conduct"}]},{"name":"Second Life Asset Rating Engine","company":"Second Life (Linden Lab)","group":"gaming","checks":[{"n":"Adult regions (maturity rating)","s":"porn","t":0.5,"d":"Second Life maturity ratings (G/M/A)"},{"n":"Violence","s":"violence","t":0.5,"d":"Second Life maturity ratings"}]},{"name":"Decentraland Asset Filter","company":"Decentraland","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"Decentraland content policy"}]},{"name":"The Sandbox Content Guard","company":"The Sandbox","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"The Sandbox content guidelines"}]},{"name":"Highrise Metaverse Guard","company":"Highrise (Pocket Worlds)","group":"gaming","checks":[{"n":"Avatar adult content","s":"porn","t":0.5,"d":"Highrise community guidelines"}]},{"name":"Zepeto Asset Inspector","company":"Zepeto (Naver Z)","group":"gaming","checks":[{"n":"Avatar adult content","s":"porn","t":0.5,"d":"Zepeto community guidelines"}]},{"name":"Spatial.io Avatar Safety","company":"Spatial","group":"gaming","checks":[{"n":"Avatar adult content","s":"porn","t":0.5,"d":"Spatial community guidelines"}]},{"name":"Resonite World Shield","company":"Resonite (Yellow Dog Man)","group":"gaming","checks":[{"n":"World adult content","s":"porn","t":0.5,"d":"Resonite content guidelines"}]},{"name":"ChilloutVR World Guard","company":"ChilloutVR (Alpha Blend)","group":"gaming","checks":[{"n":"World adult content","s":"porn","t":0.5,"d":"ChilloutVR content guidelines"}]},{"name":"Core Games Asset Scanner","company":"Core (Manticore Games)","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"Core content guidelines"}]},{"name":"PUBG Media Safety","company":"KRAFTON","group":"gaming","checks":[{"n":"Player media adult","s":"porn","t":0.5,"d":"PUBG code of conduct"}]},{"name":"Destiny 2 Community Shield","company":"Bungie","group":"gaming","checks":[{"n":"Player media adult","s":"porn","t":0.5,"d":"Bungie code of conduct"}]},{"name":"Rust Community Guard","company":"Facepunch","group":"gaming","checks":[{"n":"Server imagery adult","s":"porn","t":0.5,"d":"Facepunch server guidelines"}]},{"name":"ARK Asset Inspector","company":"Studio Wildcard","group":"gaming","checks":[{"n":"Mod imagery adult","s":"porn","t":0.5,"d":"Studio Wildcard mod guidelines"}]},{"name":"Terraria Workshop Shield","company":"Re-Logic","group":"gaming","checks":[{"n":"Workshop imagery adult","s":"porn","t":0.5,"d":"Re-Logic workshop guidelines"}]},{"name":"Dead by Daylight Safety","company":"Behaviour Interactive","group":"gaming","checks":[{"n":"Player media adult","s":"porn","t":0.5,"d":"Behaviour code of conduct"}]},{"name":"Bethesda Community Guard","company":"Bethesda (Microsoft)","group":"gaming","checks":[{"n":"Mod imagery adult","s":"porn","t":0.5,"d":"Bethesda mod guidelines"}]},{"name":"Genshin Impact World Guard","company":"HoYoverse","group":"gaming","checks":[{"n":"User content adult","s":"porn","t":0.5,"d":"HoYoverse community rules"}]},{"name":"Kongregate Media Guard","company":"Kongregate","group":"gaming","checks":[{"n":"Uploaded game adult","s":"porn","t":0.5,"d":"Kongregate content policy"}]},{"name":"Armor Games Safety","company":"Armor Games","group":"gaming","checks":[{"n":"Uploaded game adult","s":"porn","t":0.5,"d":"Armor Games content policy"}]},{"name":"CrazyGames Content Shield","company":"CrazyGames","group":"gaming","checks":[{"n":"Uploaded game adult","s":"porn","t":0.5,"d":"CrazyGames content policy"}]},{"name":"Poki Asset Inspector","company":"Poki","group":"gaming","checks":[{"n":"Uploaded game adult","s":"porn","t":0.5,"d":"Poki content policy"}]},{"name":"Y8 Games Content Guard","company":"Y8","group":"gaming","checks":[{"n":"Uploaded game adult","s":"porn","t":0.5,"d":"Y8 content policy"}]},{"name":"Game Jolt Content Shield","company":"Game Jolt","group":"gaming","checks":[{"n":"Uploaded game adult","s":"porn","t":0.5,"d":"Game Jolt content policy"},{"n":"Gore","s":"violence","t":0.5,"d":"Game Jolt content policy"}]},{"name":"itch.io Safety Guard","company":"itch.io","group":"gaming","checks":[{"n":"Uploaded game adult","s":"porn","t":0.5,"d":"itch.io content guidelines"},{"n":"Gore","s":"violence","t":0.5,"d":"itch.io content guidelines"}]},{"name":"Newgrounds Asset Inspector","company":"Newgrounds","group":"gaming","checks":[{"n":"Uploaded media adult","s":"porn","t":0.5,"d":"Newgrounds content policy (A rating)"},{"n":"Gore","s":"violence","t":0.5,"d":"Newgrounds content policy"}]},{"name":"Mod.io Asset Scanner","company":"mod.io","group":"gaming","checks":[{"n":"Mod imagery adult","s":"porn","t":0.5,"d":"mod.io content guidelines"}]},{"name":"CurseForge Media Guard","company":"CurseForge (Overwolf)","group":"gaming","checks":[{"n":"Mod imagery adult","s":"porn","t":0.5,"d":"CurseForge content guidelines"}]},{"name":"Nexus Mods Safety Engine","company":"Nexus Mods","group":"gaming","checks":[{"n":"Mod imagery adult","s":"porn","t":0.5,"d":"Nexus Mods content guidelines"}]},{"name":"GameMaker Asset Inspector","company":"GameMaker (Opera)","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"GameMaker Marketplace guidelines"}]},{"name":"Godot Asset Safety Guard","company":"Godot Engine","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"Godot Asset Library guidelines"}]},{"name":"Construct 3 Asset Shield","company":"Construct 3 (Scirra)","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"Scirra asset guidelines"}]},{"name":"Defold Media Inspector","company":"Defold Foundation","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"Defold asset guidelines"}]},{"name":"CryEngine Asset Safety","company":"Crytek","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"CryEngine Marketplace guidelines"}]},{"name":"Cocos Asset Inspector","company":"Cocos","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"Cocos Store guidelines"}]},{"name":"BabylonJS Asset Safety","company":"Babylon.js (Microsoft)","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"Babylon.js asset guidelines"}]},{"name":"PlayCanvas Guard","company":"PlayCanvas (Snap)","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"PlayCanvas asset guidelines"}]},{"name":"PlayFab Asset Inspector","company":"PlayFab (Microsoft)","group":"gaming","checks":[{"n":"Asset adult content","s":"porn","t":0.5,"d":"PlayFab content guidelines"}]},{"name":"Photon Media Shield","company":"Photon Engine (Exit Games)","group":"gaming","checks":[{"n":"Voice/chat moderation","s":null,"t":null,"d":"Photon moderation plugins"}]},{"name":"AccelByte Safety Engine","company":"AccelByte","group":"gaming","checks":[{"n":"Player content adult","s":"porn","t":0.5,"d":"AccelByte moderation service"}]},{"name":"BrainCloud Content Guard","company":"brainCloud (bitHeads)","group":"gaming","checks":[{"n":"Player content adult","s":"porn","t":0.5,"d":"brainCloud moderation service"}]},{"name":"GameAnalytics Safety","company":"GameAnalytics","group":"gaming","checks":[{"n":"Playtester media adult","s":"porn","t":0.5,"d":"GameAnalytics content guidelines"}]},{"name":"Google Cloud Vision SafeSearch","company":"Google Cloud","group":"cloud","checks":[{"n":"adult (likelihood)","s":"porn","t":0.5,"d":"SafeSearchDetection \u2014 adult likelihood"},{"n":"racy (likelihood)","s":"sexy","t":0.6,"d":"SafeSearchDetection \u2014 racy likelihood"},{"n":"violence (likelihood)","s":"violence","t":0.5,"d":"SafeSearchDetection \u2014 violence likelihood"},{"n":"spoof (likelihood)","s":null,"t":null,"d":"SafeSearchDetection \u2014 spoof/face-swap likelihood"},{"n":"medical (likelihood)","s":null,"t":null,"d":"SafeSearchDetection \u2014 medical imagery likelihood"}]},{"name":"Google Video Intelligence (Explicit)","company":"Google Cloud","group":"cloud","checks":[{"n":"pornography_likelihood","s":"porn","t":0.5,"d":"Video Intelligence explicit content detection"}]},{"name":"Azure AI Content Safety","company":"Microsoft Azure","group":"cloud","checks":[{"n":"Sexual (severity 0-7)","s":"porn","t":0.5,"d":"Azure AI Content Safety \u2014 sexual severity"},{"n":"Violence (severity 0-7)","s":"violence","t":0.5,"d":"Azure AI Content Safety \u2014 violence severity"},{"n":"Hate (severity 0-7)","s":null,"t":null,"d":"Azure AI Content Safety \u2014 hate severity"},{"n":"Self-harm (severity 0-7)","s":null,"t":null,"d":"Azure AI Content Safety \u2014 self-harm severity"}]},{"name":"Azure Video Indexer Safety","company":"Microsoft Azure","group":"cloud","checks":[{"n":"Explicit content detection","s":"porn","t":0.5,"d":"Azure Video Indexer content moderation"}]},{"name":"AWS Rekognition Moderation","company":"Amazon Web Services","group":"cloud","checks":[{"n":"Explicit Nudity label","s":"porn","t":0.5,"d":"DetectModerationLabels \u2014 Explicit Nudity"},{"n":"Suggestive label","s":"sexy","t":0.6,"d":"DetectModerationLabels \u2014 Suggestive"},{"n":"Violence label","s":"violence","t":0.5,"d":"DetectModerationLabels \u2014 Violence"},{"n":"Visually Disturbing label","s":"violence","t":0.5,"d":"DetectModerationLabels \u2014 Visually Disturbing"},{"n":"Rude Gestures label","s":null,"t":null,"d":"DetectModerationLabels \u2014 Rude Gestures"},{"n":"Drugs label","s":null,"t":null,"d":"DetectModerationLabels \u2014 Drugs"},{"n":"Tobacco label","s":null,"t":null,"d":"DetectModerationLabels \u2014 Tobacco"},{"n":"Alcohol label","s":null,"t":null,"d":"DetectModerationLabels \u2014 Alcohol"},{"n":"Gambling label","s":null,"t":null,"d":"DetectModerationLabels \u2014 Gambling"},{"n":"Hate Symbols label","s":null,"t":null,"d":"DetectModerationLabels \u2014 Hate Symbols"}]},{"name":"AWS Bedrock Guardrails","company":"Amazon Web Services","group":"cloud","checks":[{"n":"Content filter \u2014 sexual","s":"porn","t":0.5,"d":"Amazon Bedrock Guardrails content filters"},{"n":"Content filter \u2014 violence","s":"violence","t":0.5,"d":"Amazon Bedrock Guardrails content filters"},{"n":"Content filter \u2014 hate","s":null,"t":null,"d":"Amazon Bedrock Guardrails content filters"}]},{"name":"AWS Transcribe Toxicity","company":"Amazon Web Services","group":"cloud","checks":[{"n":"Toxicity detection (audio)","s":null,"t":null,"d":"AWS Transcribe Call Analytics toxicity (audio-level)"}]},{"name":"IBM Watson Content Moderator","company":"IBM","group":"cloud","checks":[{"n":"Explicit visual score","s":"porn","t":0.5,"d":"IBM Visual Recognition explicit classifier"},{"n":"Disturbing image score","s":"violence","t":0.5,"d":"IBM Visual Recognition disturbing classifier"}]},{"name":"Tencent Cloud Content Moderation","company":"Tencent Cloud","group":"cloud","checks":[{"n":"Porn detection (CMS)","s":"porn","t":0.5,"d":"Tencent Cloud CMS \u2014 porn detection"},{"n":"Terrorism content","s":"violence","t":0.5,"d":"Tencent Cloud CMS \u2014 terror content"},{"n":"Politics (sensitive)","s":null,"t":null,"d":"Tencent Cloud CMS \u2014 political content"},{"n":"Ad/illegal content","s":null,"t":null,"d":"Tencent Cloud CMS \u2014 ad & illegal content"}]},{"name":"Baidu AI Content Moderation","company":"Baidu AI Cloud","group":"cloud","checks":[{"n":"Porn detection","s":"porn","t":0.5,"d":"Baidu Content Moderation API \u2014 porn"},{"n":"Terrorism & violence","s":"violence","t":0.5,"d":"Baidu Content Moderation API \u2014 terror/violence"},{"n":"Sensitive politics","s":null,"t":null,"d":"Baidu Content Moderation API \u2014 politics"},{"n":"Spam/ad","s":null,"t":null,"d":"Baidu Content Moderation API \u2014 spam/ad"}]},{"name":"Alibaba Cloud Content Moderation","company":"Alibaba Cloud","group":"cloud","checks":[{"n":"Porn detection (green)","s":"porn","t":0.5,"d":"Alibaba Cloud Content Moderation \u2014 porn"},{"n":"Terrorism & violence","s":"violence","t":0.5,"d":"Alibaba Cloud Content Moderation \u2014 terror"},{"n":"Ad/spam","s":null,"t":null,"d":"Alibaba Cloud Content Moderation \u2014 ad/spam"}]},{"name":"Huawei Cloud Content Moderation","company":"Huawei Cloud","group":"cloud","checks":[{"n":"Porn detection","s":"porn","t":0.5,"d":"Huawei Cloud Content Moderation \u2014 porn"},{"n":"Violence & terror","s":"violence","t":0.5,"d":"Huawei Cloud Content Moderation \u2014 terror"},{"n":"Sensitive politics","s":null,"t":null,"d":"Huawei Cloud Content Moderation \u2014 politics"}]},{"name":"NAVER Clova GreenEye","company":"NAVER Cloud","group":"cloud","checks":[{"n":"Adult detection","s":"porn","t":0.5,"d":"Clova GreenEye NSFW detector"},{"n":"Suggestive detection","s":"sexy","t":0.6,"d":"Clova GreenEye suggestive detector"}]},{"name":"Oracle OCI Vision Safety","company":"Oracle Cloud","group":"cloud","checks":[{"n":"Image classification (explicit)","s":"porn","t":0.5,"d":"OCI Vision custom/pretrained image analysis"}]},{"name":"Google Vertex AI Safety","company":"Google Cloud","group":"cloud","checks":[{"n":"Safety filters \u2014 sexual","s":"porn","t":0.5,"d":"Vertex AI safety filters"},{"n":"Safety filters \u2014 violence","s":"violence","t":0.5,"d":"Vertex AI safety filters"},{"n":"Safety filters \u2014 hate","s":null,"t":null,"d":"Vertex AI safety filters"}]},{"name":"Cloudinary AI Moderation","company":"Cloudinary","group":"cloud","checks":[{"n":"AI content moderation (add-on)","s":"porn","t":0.5,"d":"Cloudinary add-on powered by Google Vision SafeSearch"}]},{"name":"Sightengine Moderation API","company":"Sightengine","group":"specialized","checks":[{"n":"nudity-2.0 (raw)","s":"porn","t":0.5,"d":"Sightengine nudity model \u2014 raw probability"},{"n":"nudity-2.0 (partial)","s":"sexy","t":0.6,"d":"Sightengine nudity model \u2014 partial exposure"},{"n":"offensive model","s":null,"t":null,"d":"Sightengine offensive model (text/symbols)"},{"n":"gore model","s":"violence","t":0.5,"d":"Sightengine gore model"},{"n":"weapons model","s":null,"t":null,"d":"Sightengine weapons model"},{"n":"drugs/alcohol model","s":null,"t":null,"d":"Sightengine drugs & alcohol models"},{"n":"scam model","s":null,"t":null,"d":"Sightengine scam model"}]},{"name":"Hive AI Moderation Engine","company":"Hive","group":"specialized","checks":[{"n":"Sexual content model","s":"porn","t":0.5,"d":"Hive visual moderation \u2014 sexual content"},{"n":"Violence & gore model","s":"violence","t":0.5,"d":"Hive visual moderation \u2014 violence/gore"},{"n":"Weapons model","s":null,"t":null,"d":"Hive visual moderation \u2014 weapons"},{"n":"Drugs model","s":null,"t":null,"d":"Hive visual moderation \u2014 drugs"}]},{"name":"JigsawStack NSFW API","company":"JigsawStack","group":"specialized","checks":[{"n":"NSFW confidence score","s":"porn","t":0.5,"d":"JigsawStack combined explicit score"},{"n":"Gore probability","s":"violence","t":0.5,"d":"JigsawStack combined gore score"}]},{"name":"Clarifai Visual Safety","company":"Clarifai","group":"specialized","checks":[{"n":"NSFW model","s":"porn","t":0.5,"d":"Clarifai NSFW concept model"},{"n":"Gore model","s":"violence","t":0.5,"d":"Clarifai gore concept model"},{"n":"Weapon model","s":null,"t":null,"d":"Clarifai weapon concept model"},{"n":"Drug model","s":null,"t":null,"d":"Clarifai drug concept model"}]},{"name":"ModerateContent API","company":"ModerateContent","group":"specialized","checks":[{"n":"Adult rating","s":"porn","t":0.5,"d":"ModerateContent.com adult rating"},{"n":"Violence rating","s":"violence","t":0.5,"d":"ModerateContent.com violence rating"}]},{"name":"WebPurify Media Guard","company":"WebPurify","group":"specialized","checks":[{"n":"Nudity detection","s":"porn","t":0.5,"d":"WebPurify image moderation \u2014 nudity"},{"n":"Weapons detection","s":null,"t":null,"d":"WebPurify image moderation \u2014 weapons"},{"n":"Drugs detection","s":null,"t":null,"d":"WebPurify image moderation \u2014 drugs"},{"n":"Gore detection","s":"violence","t":0.5,"d":"WebPurify image moderation \u2014 gore"}]},{"name":"Spectrum Labs Guardian","company":"Spectrum Labs","group":"specialized","checks":[{"n":"Toxicity (text/audio)","s":null,"t":null,"d":"Spectrum Labs Guardian \u2014 text/audio toxicity"}]},{"name":"ActiveFence Safety Matrix","company":"ActiveFence","group":"specialized","checks":[{"n":"CSAM detection","s":null,"t":null,"d":"ActiveFence \u2014 child safety"},{"n":"Violent extremism","s":"violence","t":0.5,"d":"ActiveFence \u2014 terror & extremism"},{"n":"Adult content","s":"porn","t":0.5,"d":"ActiveFence \u2014 adult content"}]},{"name":"Bodyguard.ai Content Guard","company":"Bodyguard.ai","group":"specialized","checks":[{"n":"Toxic content (text)","s":null,"t":null,"d":"Bodyguard.ai text moderation"}]},{"name":"Checkstep Moderation Engine","company":"Checkstep","group":"specialized","checks":[{"n":"NSFW detection","s":"porn","t":0.5,"d":"Checkstep moderation models"},{"n":"Violence detection","s":"violence","t":0.5,"d":"Checkstep moderation models"}]},{"name":"Unitary.ai Visual Safety","company":"Unitary","group":"specialized","checks":[{"n":"Visual harm classification","s":"porn","t":0.5,"d":"Unitary visual moderation models"},{"n":"Violence","s":"violence","t":0.5,"d":"Unitary visual moderation models"}]},{"name":"Two Hat Community Sift","company":"Two Hat","group":"specialized","checks":[{"n":"Image moderation","s":"porn","t":0.5,"d":"Two Hat Community Sift image moderation"},{"n":"Text toxicity","s":null,"t":null,"d":"Two Hat Community Sift text moderation"}]},{"name":"IAS (Integral Ad Science) Guard","company":"Integral Ad Science","group":"specialized","checks":[{"n":"Brand safety \u2014 adult","s":"porn","t":0.5,"d":"IAS brand safety categorization"},{"n":"Brand safety \u2014 violence","s":"violence","t":0.5,"d":"IAS brand safety categorization"}]},{"name":"DoubleVerify Brand Safety","company":"DoubleVerify","group":"specialized","checks":[{"n":"Brand safety \u2014 adult","s":"porn","t":0.5,"d":"DoubleVerify brand safety categorization"},{"n":"Brand safety \u2014 violence","s":"violence","t":0.5,"d":"DoubleVerify brand safety categorization"}]},{"name":"MOAT Ad Safety Shield","company":"MOAT (Oracle)","group":"specialized","checks":[{"n":"Ad brand safety \u2014 adult","s":"porn","t":0.5,"d":"MOAT (Oracle) ad verification"},{"n":"Ad brand safety \u2014 violence","s":"violence","t":0.5,"d":"MOAT (Oracle) ad verification"}]},{"name":"Pixalate Media Guard","company":"Pixalate","group":"specialized","checks":[{"n":"Ad fraud & brand safety","s":"porn","t":0.5,"d":"Pixalate brand safety ratings"}]},{"name":"OpenWeb Moderation Engine","company":"OpenWeb","group":"specialized","checks":[{"n":"Comment toxicity","s":null,"t":null,"d":"OpenWeb conversation moderation"}]},{"name":"CleanSpeak Media Guard","company":"CleanSpeak (Inversoft)","group":"specialized","checks":[{"n":"Profanity/toxicity (text)","s":null,"t":null,"d":"CleanSpeak text moderation filters"}]},{"name":"BrandShield Safety API","company":"BrandShield","group":"specialized","checks":[{"n":"Counterfeit/brand abuse (visual)","s":"porn","t":0.5,"d":"BrandShield visual brand protection"}]},{"name":"Modulate ToxMod Audio Guard","company":"Modulate","group":"specialized","checks":[{"n":"Voice toxicity (audio)","s":null,"t":null,"d":"Modulate ToxMod voice moderation (audio-level)"}]},{"name":"Speechmatics Safety Inspector","company":"Speechmatics","group":"specialized","checks":[{"n":"Transcribed toxicity (audio)","s":null,"t":null,"d":"Speechmatics transcription + moderation"}]},{"name":"NSFWJS (TensorFlow.js)","company":"Infinite Red","group":"models","checks":[{"n":"Porn class","s":"porn","t":0.5,"d":"NSFWJS MobileNetV2 \u2014 Porn probability"},{"n":"Sexy class","s":"sexy","t":0.6,"d":"NSFWJS MobileNetV2 \u2014 Sexy probability"},{"n":"Hentai class","s":"hentai","t":0.5,"d":"NSFWJS MobileNetV2 \u2014 Hentai probability"},{"n":"Drawing class","s":"drawing","t":0.5,"d":"NSFWJS MobileNetV2 \u2014 Drawing probability"},{"n":"Neutral class","s":"neutral","t":0.5,"d":"NSFWJS MobileNetV2 \u2014 Neutral probability"}]},{"name":"NudeNet ONNX Model","company":"NudeNet (nota)","group":"models","checks":[{"n":"Exposed genitals (F/M)","s":"porn","t":0.5,"d":"NudeNet body-part classifier"},{"n":"Exposed breast","s":"porn","t":0.5,"d":"NudeNet body-part classifier"},{"n":"Exposed buttocks","s":"sexy","t":0.6,"d":"NudeNet body-part classifier"},{"n":"Belly / armpits / feet","s":"sexy","t":0.6,"d":"NudeNet body-part classifier"}]},{"name":"Yahoo OpenNSFW Model","company":"Yahoo","group":"models","checks":[{"n":"NSFW probability (0-1)","s":"porn","t":0.5,"d":"OpenNSFW Caffe/ResNet classifier"}]},{"name":"CLIP-NSFW (OpenAI Zero-Shot)","company":"OpenAI","group":"models","checks":[{"n":"NSFW zero-shot score","s":"porn","t":0.5,"d":"CLIP-based NSFW prompt/class scoring"}]},{"name":"Stable Diffusion Safety Checker","company":"Stability AI","group":"models","checks":[{"n":"NSFW (CLIP safety checker)","s":"porn","t":0.5,"d":"CompVis/Latent Diffusion safety checker"}]},{"name":"ShieldGemma Safety Model","company":"Google","group":"models","checks":[{"n":"Sexually explicit","s":"porn","t":0.5,"d":"ShieldGemma \u2014 sexual content guard"},{"n":"Dangerous content","s":"violence","t":0.5,"d":"ShieldGemma \u2014 dangerous content"},{"n":"Harassment","s":null,"t":null,"d":"ShieldGemma \u2014 harassment"},{"n":"Hate speech","s":null,"t":null,"d":"ShieldGemma \u2014 hate speech"}]},{"name":"OpenAI DALL-E Safety Classifier","company":"OpenAI","group":"models","checks":[{"n":"Sexual content classifier","s":"porn","t":0.5,"d":"DALL-E safety classifier"},{"n":"Violence classifier","s":"violence","t":0.5,"d":"DALL-E safety classifier"},{"n":"Hate symbols classifier","s":null,"t":null,"d":"DALL-E safety classifier"}]},{"name":"Google Imagen Safety Inspector","company":"Google","group":"models","checks":[{"n":"Safety filter \u2014 explicit","s":"porn","t":0.5,"d":"Imagen safety filters"},{"n":"Safety filter \u2014 violence","s":"violence","t":0.5,"d":"Imagen safety filters"}]},{"name":"Midjourney Moderation","company":"Midjourney","group":"models","checks":[{"n":"Prompt/image moderation (banned terms)","s":"porn","t":0.5,"d":"Midjourney AI moderation + community standards"}]},{"name":"OpenAI Whisper Transcriber","company":"OpenAI","group":"models","checks":[{"n":"Transcription for audio moderation","s":null,"t":null,"d":"Whisper ASR used as moderation pre-processing (audio-level)"}]},{"name":"YOLOv8/v9 Object Detector","company":"Ultralytics","group":"models","checks":[{"n":"COCO object detection (person/objects)","s":null,"t":null,"d":"YOLO object detection used in moderation pipelines"}]},{"name":"OpenCLIP Safety Vector","company":"LAION","group":"models","checks":[{"n":"Safety/NSFW embedding classifier","s":"porn","t":0.5,"d":"OpenCLIP zero-shot NSFW classification"}]},{"name":"Meta Wav2Vec2 Audio Inspector","company":"Meta","group":"models","checks":[{"n":"Speech representation for audio moderation","s":null,"t":null,"d":"Wav2Vec2 ASR features used for audio moderation"}]}]};
+
+  function RoboModError(message, code) {
+    var e = new Error(message);
+    e.name = 'RoboModError';
+    e.code = code || 'error';
+    return e;
+  }
+
+  function requireDOM(fn) {
+    if (typeof document === 'undefined') throw RoboModError(fn + ' needs a browser DOM.', 'no-dom');
+  }
+
+  function round4(x) { return Math.round(x * 10000) / 10000; }
+
+  /* ------------------------------------------------------------ *
+   *  Pure core — no DOM, no model. Works in browser and Node.
+   *  Turns raw model scores into per-service verdicts.
+   *
+   *  scores: { Porn, Sexy, Hentai, ViolenceGore, Neutral, Drawing, skin }
+   * ------------------------------------------------------------ */
+  var MEASURABLE = { porn: 1, sexy: 1, hentai: 1, violence: 1, skin: 1, sexual: 1, hate: 1, harass: 1, selfharm: 1, weapons: 1, drugs: 1 };
+
+  var TEXT_CATS = {
+    sexual: ['sex','porn','porno','xxx','nude','nudity','naked','pussy','penis','vagina','dick','cock','cum','anal','blowjob','handjob','masturbat','hentai','escort','prostitut','brothel','orgy'],
+    hate: ['nigger','nigga','faggot','retard','kike','chink','spic','wetback','gook','heil hitler','whitepower','nazi','jihadist','isis','kuklux','klansman'],
+    harass: ['kill yourself','kill urself','kys','i will kill you','gonna kill you','you should die','go die','doxx','dox ','i know where you live','i will find you','shut the fuck up','stfu','piece of shit','stupid bitch'],
+    selfharm: ['suicide','kill myself','kms','self harm','self-harm','cut myself','cutting myself','end my life','want to die','wanna die','overdose','hang myself'],
+    weapons: ['gun','guns','rifle','shotgun','handgun','pistol','ammo','ammunition','bomb','explosive','c4','grenade','shoot up','shootout','mass shooting','firearm','firearms','ak-47','ar-15','uzi'],
+    drugs: ['cocaine','heroin','meth','methamphetamine','fentanyl','crack cocaine','lsd','ecstasy','mdma','opioid','opioids','narcotics','ketamine']
+  };
+
+  function scanText(text) {
+    var t = ' ' + String(text == null ? '' : text).toLowerCase() + ' ';
+    var out = { hasText: true };
+    Object.keys(TEXT_CATS).forEach(function (cat) {
+      var count = 0;
+      TEXT_CATS[cat].forEach(function (term) {
+        if (term.indexOf(' ') !== -1) {
+          if (t.indexOf(term) !== -1) count++;
+        } else {
+          var re = new RegExp('\\b' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
+          if (re.test(t)) count++;
+        }
+      });
+      out[cat] = count === 0 ? 0 : Math.min(0.95, 0.45 + 0.15 * count);
+    });
+    return out;
+  }
+
+  function textSignalFor(name) {
+    var n = String(name == null ? '' : name).toLowerCase();
+    if (/child|csam|minor|groom|exploit/.test(n)) return null;
+    if (/audio|voice|transcri/.test(n)) return null;
+    if (/hate|slur|extremis|terror|discriminat/.test(n)) return 'hate';
+    if (/self.?harm|suicide|self.?injur/.test(n)) return 'selfharm';
+    if (/sexual|explicit|nsfw|nudity|porn/.test(n)) return 'sexual';
+    if (/weapon|firearm|gun|explosiv|ammo/.test(n)) return 'weapons';
+    if (/drug|narcotic|substance|regulated goods/.test(n)) return 'drugs';
+    if (/harass|bully|abuse|intimidat|threat|toxicit|toxic|offensive|profanit/.test(n)) return 'harass';
+    return null;
+  }
+
+  function sniffKind(file) {
+    return new Promise(function (resolve) {
+      try {
+        var fr = new FileReader();
+        var blob = file.slice ? file.slice(0, 4096) : file;
+        fr.onload = function () { try { resolve(detectFromBytes(new Uint8Array(fr.result))); } catch (e) { resolve('binary'); } };
+        fr.onerror = function () { resolve('binary'); };
+        fr.readAsArrayBuffer(blob);
+      } catch (e) { resolve('binary'); }
+    });
+  }
+
+  function detectFromBytes(b) {
+    var s = '';
+    var n = Math.min(b.length, 8);
+    for (var i = 0; i < n; i++) s += String.fromCharCode(b[i]);
+    if (b[0] === 0x89 && b[1] === 0x50) return 'image';
+    if (b[0] === 0xFF && b[1] === 0xD8) return 'image';
+    if (s.slice(0,6) === 'GIF87a' || s.slice(0,6) === 'GIF89a') return 'image';
+    if (b[0] === 0x42 && b[1] === 0x4D) return 'image';
+    if (s.slice(0,4) === 'RIFF' && s.slice(8,12) === 'WEBP') return 'image';
+    if (s.slice(0,4) === '%PDF') return 'pdf';
+    if (s.slice(0,4) === 'OggS') return 'audio';
+    if (s.slice(0,3) === 'ID3') return 'audio';
+    if (s.slice(0,4) === 'RIFF' && s.slice(8,12) === 'WAVE') return 'audio';
+    if (s.slice(0,4) === 'ftyp' || s.slice(4,8) === 'ftyp') return 'video';
+    if (b[0] === 0x1A && b[1] === 0x45 && b[2] === 0xDF && b[3] === 0xA3) return 'video';
+    if (b[0] === 0x50 && b[1] === 0x4B) return 'binary';
+    var nulls = 0, nonprint = 0;
+    var m = Math.min(b.length, 512);
+    for (var j = 0; j < m; j++) {
+      if (b[j] === 0) nulls++;
+      else if (b[j] < 9 || (b[j] > 13 && b[j] < 32)) nonprint++;
+    }
+    if (m > 0 && nulls === 0 && nonprint < m * 0.05) return 'text';
+    return 'binary';
+  }
+
+  function checkServices(scores) {
+    scores = scores || {};
+    var P = scores.Porn;
+    var S = scores.Sexy;
+    var H = scores.Hentai;
+    var V = scores.ViolenceGore;
+    var N = scores.Neutral;
+    var D = scores.Drawing;
+    var skin = scores.skin;
+
+    function sig(signal) {
+      switch (signal) {
+        case 'porn': return P;
+        case 'sexy': return S;
+        case 'hentai': return H;
+        case 'violence': return V;
+        case 'skin': return skin;
+        case 'drawing': return D;
+        case 'neutral': return N;
+        case 'sexual': return scores.sexual != null ? scores.sexual : null;
+        case 'hate': return scores.hate != null ? scores.hate : null;
+        case 'harass': return scores.harass != null ? scores.harass : null;
+        case 'selfharm': return scores.selfharm != null ? scores.selfharm : null;
+        case 'weapons': return scores.weapons != null ? scores.weapons : null;
+        case 'drugs': return scores.drugs != null ? scores.drugs : null;
+        default: return null;
+      }
+    }
+
+    return BRAND.services.map(function (s) {
+      var checks = s.checks.map(function (c) {
+        var out = { name: c.n, desc: c.d, signal: c.s, threshold: c.t, state: 'na', score: null };
+        var signal = c.s;
+        if (!signal) {
+          var cat = textSignalFor(c.n);
+          if (cat && scores[cat] != null) signal = cat;
+          else return out;
+        }
+        if (!MEASURABLE[signal]) return out;
+        var sc = sig(signal);
+        if (sc == null) return out;
+        out.score = Math.round(sc * 100);
+        out.state = sc >= (c.t || 0.5) ? 'flag' : 'pass';
+        return out;
+      });
+      var flagged = 0, measurable = 0;
+      checks.forEach(function (c) { if (c.state === 'flag') flagged++; if (c.state !== 'na') measurable++; });
+      return {
+        name: s.name, company: s.company, group: s.group,
+        status: flagged > 0 ? 'FLAG' : (measurable === 0 ? 'NA' : 'SAFE'),
+        flagged: flagged, measurable: measurable, checks: checks
+      };
+    });
+  }
+
+  function summarize(services) {
+    var safe = 0, flagged = 0, na = 0;
+    (services || []).forEach(function (s) {
+      if (s.status === 'FLAG') flagged++;
+      else if (s.status === 'SAFE') safe++;
+      else na++;
+    });
+    return { total: (services || []).length, safe: safe, flagged: flagged, na: na };
+  }
+
+  // verdict(input) — the one-liner answer. Accepts a raw scores object, a
+  // services array, or an analyze() result.
+  // Returns { safe, status:'SAFE'|'FLAGGED', flagged, safeCount, na, total }
+  function verdict(input) {
+    var list;
+    if (Array.isArray(input)) list = input;
+    else if (input && input.services) list = input.services;
+    else if (input && typeof input === 'object' && (input.Porn != null || input.Sexy != null || input.ViolenceGore != null || input.sexual != null || input.hate != null)) list = checkServices(input);
+    else list = [];
+    var s = summarize(list);
+    return { safe: s.flagged === 0, status: s.flagged > 0 ? 'FLAGGED' : 'SAFE', flagged: s.flagged, safeCount: s.safe, na: s.na, total: s.total };
+  }
+
+  /* ------------------------------------------------------------ *
+   *  AI engine — loaded lazily, only when a file is actually checked.
+   * ------------------------------------------------------------ */
+  var loading = {};
+  function loadScript(src) {
+    if (!loading[src]) {
+      loading[src] = new Promise(function (res, rej) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = function () { res(); };
+        s.onerror = function () { rej(RoboModError('Failed to load ' + src, 'script-load')); };
+        document.head.appendChild(s);
+      });
+    }
+    return loading[src];
+  }
+
+  var nsfwModel = null, modelPromise = null;
+  function ensureModel() {
+    if (nsfwModel) return Promise.resolve(nsfwModel);
+    if (modelPromise) return modelPromise;
+    modelPromise = (function () {
+      if (typeof window === 'undefined') return Promise.reject(RoboModError('The AI model needs a browser.', 'no-browser'));
+      var p = Promise.resolve();
+      if (!window.tf) p = p.then(function () { return loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js'); });
+      if (!window.nsfwjs) p = p.then(function () { return loadScript('https://cdn.jsdelivr.net/npm/nsfwjs@2.4.2/dist/nsfwjs.min.js'); });
+      return p.then(function () {
+        var sources = [
+          'https://cdn.jsdelivr.net/gh/infinitered/nsfwjs@gh-pages/models/mobilenet_v2/',
+          'https://cdn.jsdelivr.net/gh/infinitered/nsfwjs@gh-pages/models/mobilenet_v2_mid/',
+          null
+        ];
+        var chain = Promise.resolve();
+        for (var i = 0; i < sources.length; i++) {
+          (function (src) {
+            chain = chain.then(function () {
+              if (nsfwModel) return nsfwModel;
+              try {
+                return (src ? window.nsfwjs.load(src) : window.nsfwjs.load()).then(function (m) { nsfwModel = m; return m; });
+              } catch (e) { return null; }
+            });
+          })(sources[i]);
+        }
+        return chain;
+      });
+    })().catch(function (e) { modelPromise = null; throw e; });
+    return modelPromise;
+  }
+
+  var hcv = null;
+  function analyzeHeuristics(source) {
+    if (!hcv) hcv = document.createElement('canvas');
+    hcv.width = 150; hcv.height = 150;
+    var ctx = hcv.getContext('2d');
+    ctx.drawImage(source, 0, 0, 150, 150);
+    var d;
+    try { d = ctx.getImageData(0, 0, 150, 150).data; }
+    catch (e) { return { bloodScore: 0, skinScore: 0, isVectorIllustration: false }; }
+    var red = 0, skin = 0, total = d.length / 4, cmap = {};
+    for (var i = 0; i < d.length; i += 4) {
+      var r = d[i], g = d[i + 1], b = d[i + 2];
+      var q = Math.round(r / 30) + ',' + Math.round(g / 30) + ',' + Math.round(b / 30);
+      cmap[q] = (cmap[q] || 0) + 1;
+      if (r > 130 && g < 60 && b < 60 && (r - Math.max(g, b) > 50)) red++;
+      if (r > 95 && g > 40 && b > 20 && r > g && r > b && Math.abs(r - g) > 15) skin++;
+    }
+    var counts = [];
+    for (var k in cmap) counts.push(cmap[k]);
+    counts.sort(function (a, b) { return b - a; });
+    var top3 = ((counts[0] || 0) + (counts[1] || 0) + (counts[2] || 0)) / total;
+    var isVector = top3 > 0.65;
+    return {
+      bloodScore: Math.min(1, (red / total) * 8),
+      skinScore: isVector ? 0 : Math.min(1, Math.max(0, ((skin / total) - 0.35) * 2)),
+      isVectorIllustration: isVector
+    };
+  }
+
+  // classify(imageOrCanvas, opts) -> Promise<{ scores, skin, heuristics }>
+  function classify(source, o) {
+    requireDOM('classify()');
+    return ensureModel().catch(function () { return null; }).then(function () {
+      var heur = analyzeHeuristics(source);
+      var s = { Porn: 0, Sexy: 0, Hentai: 0, ViolenceGore: heur.bloodScore, Neutral: 0.85, Drawing: heur.isVectorIllustration ? 0.9 : 0 };
+      if (!nsfwModel) { s.Sexy = heur.skinScore; return { scores: s, skin: heur.skinScore, heuristics: heur }; }
+      return nsfwModel.classify(source).then(function (preds) {
+        preds.forEach(function (p) {
+          if (p.className === 'Porn') s.Porn = p.probability;
+          if (p.className === 'Hentai') s.Hentai = p.probability;
+          if (p.className === 'Sexy') s.Sexy = p.probability;
+          if (p.className === 'Neutral') s.Neutral = p.probability;
+          if (p.className === 'Drawing') s.Drawing = p.probability;
         });
-
-        // DOM elements
-        const canvas = document.getElementById('gridCanvas');
-        const ctx = canvas.getContext('2d');
-        const resolvedView = document.getElementById('resolved-view');
-        const canvasContainer = document.getElementById('canvas-container');
-        const resolvedCode = document.getElementById('resolved-code');
-        const resolvedStatusText = document.getElementById('resolved-status-text');
-        const resolvedDesc = document.getElementById('resolved-desc');
-        const favicon = document.getElementById('favicon');
-        const headerEl = document.getElementById('app-header');
-
-        // Animation config
-        const totalAnimationDuration = 5500; // Single continuous sequence length (ms)
-        const assemblyPoint = 0.70; // 70% point where orbit moves to text targets
-        
-        let animationStartTime = 0;
-        let animationFrameId = null;
-        let isAnimating = false;
-
-        // Particle configurations
-        const totalParticles = 650;
-        let particles = [];
-        let textTargets = [];
-
-        // Auto-sizing canvas helper
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * window.devicePixelRatio;
-            canvas.height = rect.height * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        if (heur.isVectorIllustration && s.Porn < 0.7) {
+          s.Sexy = Math.min(0.2, s.Sexy);
+          s.Porn = Math.min(0.2, s.Porn);
+          s.Drawing = Math.max(s.Drawing, 0.85);
+          s.Neutral = Math.max(s.Neutral, 0.75);
         }
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            if (!isAnimating) drawStaticState();
-        });
+        return { scores: s, skin: heur.skinScore, heuristics: heur };
+      }).catch(function () { s.Sexy = heur.skinScore; return { scores: s, skin: heur.skinScore, heuristics: heur }; });
+    });
+  }
 
-        resizeCanvas();
+  /* ------------------------------------------------------------ *
+   *  File readers — no previews, no UI, just the pixels / audio.
+   * ------------------------------------------------------------ */
+  function loadImage(file) {
+    return new Promise(function (res, rej) {
+      var url;
+      try { url = URL.createObjectURL(file); } catch (e) {}
+      var img = new Image();
+      img.onload = function () { res(img); };
+      img.onerror = function () { rej(RoboModError('Could not decode image.', 'image-decode')); };
+      img.src = url;
+    });
+  }
 
-        // Helper to get theme colors
-        function getThemeColors() {
-            const isDark = document.documentElement.classList.contains('dark');
-            return {
-                text: isDark ? 'rgba(248, 250, 252, 0.95)' : 'rgba(15, 23, 42, 0.95)',
-                particleColor: isDark ? 'rgba(129, 140, 248, 0.9)' : 'rgba(79, 70, 229, 0.9)',
-                particleTrace: isDark ? 'rgba(129, 140, 248, 0.05)' : 'rgba(79, 70, 229, 0.04)'
-            };
+  function firstFrame(file) {
+    return new Promise(function (res, rej) {
+      var url;
+      try { url = URL.createObjectURL(file); } catch (e) {}
+      var v = document.createElement('video');
+      v.muted = true; v.playsInline = true; v.src = url;
+      v.onloadeddata = function () {
+        var c = document.createElement('canvas');
+        c.width = v.videoWidth || 300; c.height = v.videoHeight || 300;
+        c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+        res(c);
+      };
+      v.onerror = function () { rej(RoboModError('Could not decode video.', 'video-decode')); };
+    });
+  }
+
+  function audioScores(file) {
+    return new Promise(function (res) {
+      var neutral = { Porn: 0, Sexy: 0, Hentai: 0, ViolenceGore: 0.05, Neutral: 0.95, Drawing: 0 };
+      var fr = new FileReader();
+      fr.onerror = function () { res(neutral); };
+      fr.onload = function () {
+        var Ctx = (typeof window !== 'undefined') && (window.AudioContext || window.webkitAudioContext);
+        if (!Ctx) return res(neutral);
+        var ctx = new Ctx();
+        ctx.decodeAudioData(fr.result, function (buf) {
+          var raw = buf.getChannelData(0), peak = 0, hi = 0;
+          for (var i = 0; i < raw.length; i += 100) {
+            var a = Math.abs(raw[i]);
+            if (a > peak) peak = a;
+            if (a > 0.85) hi++;
+          }
+          var loud = peak > 0.95 && hi > 50;
+          res({ Porn: 0, Sexy: 0, Hentai: 0, ViolenceGore: loud ? 0.65 : 0.05, Neutral: loud ? 0.35 : 0.95, Drawing: 0 });
+        }, function () { res(neutral); });
+      };
+      fr.readAsArrayBuffer(file);
+    });
+  }
+
+  var pdfReady = null;
+  function ensurePdf() {
+    if (pdfReady) return pdfReady;
+    pdfReady = (function () {
+      if (window.pdfjsLib) return Promise.resolve();
+      return loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js').then(function () {
+        if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
+      });
+    })();
+    return pdfReady;
+  }
 
-        // Clear state canvas
-        function drawStaticState() {
-            ctx.clearRect(0, 0, canvas.width / window.devicePixelRatio, canvas.height / window.devicePixelRatio);
-        }
-
-        // Analyze current code text offscreen in Helvetica Medium
-        function generateTextTargets(text) {
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = 320;
-            tempCanvas.height = 120;
-            
-            tempCtx.fillStyle = 'black';
-            tempCtx.font = '500 75px "Helvetica Neue", "Helvetica", "Arial", sans-serif';
-            tempCtx.textAlign = 'center';
-            tempCtx.textBaseline = 'middle';
-            tempCtx.fillText(text, tempCanvas.width / 2, tempCanvas.height / 2);
-            
-            const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            const data = imgData.data;
-            const points = [];
-            
-            const step = 3.5; 
-            for (let y = 0; y < tempCanvas.height; y += step) {
-                for (let x = 0; x < tempCanvas.width; x += step) {
-                    const idx = (Math.floor(y) * tempCanvas.width + Math.floor(x)) * 4;
-                    if (data[idx + 3] > 100) {
-                        points.push({
-                            x: (x - tempCanvas.width / 2) / tempCanvas.height,
-                            y: (y - tempCanvas.height / 2) / tempCanvas.height
-                        });
-                    }
-                }
-            }
-            return points;
-        }
-
-        // Create particles
-        function initParticles() {
-            particles = [];
-            textTargets = generateTextTargets(window.ErrorStatus);
-            
-            for (let i = 0; i < totalParticles; i++) {
-                const target = textTargets[i % textTargets.length] || { x: 0, y: 0 };
-                
-                particles.push({
-                    tx: target.x,
-                    ty: target.y,
-                    orbitRadiusX: 180 + Math.random() * 240,
-                    orbitRadiusY: 80 + Math.random() * 120,
-                    angle: Math.random() * Math.PI * 2,
-                    angleSpeed: (0.01 + Math.random() * 0.015) * (Math.random() > 0.5 ? 1 : -1),
-                    tilt: (Math.random() - 0.5) * 1.1, 
-                    size: 9 + Math.floor(Math.random() * 5),
-                    x: 0,
-                    y: 0
+  function pdfScores(file, o) {
+    o = o || {};
+    var limit = o.maxPdfPages || DEFAULTS.maxPdfPages;
+    return ensurePdf().then(function () { return file.arrayBuffer(); })
+      .then(function (ab) { return window.pdfjsLib.getDocument({ data: ab }).promise; })
+      .then(function (doc) {
+        var total = doc.numPages, pages = Math.min(total, limit);
+        var agg = { Porn: 0, Sexy: 0, Hentai: 0, ViolenceGore: 0, Neutral: 0, Drawing: 0 };
+        var aggSkin = 0;
+        var chain = Promise.resolve();
+        for (var p = 1; p <= pages; p++) {
+          (function (pn) {
+            chain = chain.then(function () { return doc.getPage(pn); }).then(function (page) {
+              var base = page.getViewport({ scale: 1 });
+              var scale = Math.min(2, 1200 / Math.max(base.width, base.height));
+              var vp = page.getViewport({ scale: scale });
+              var c = document.createElement('canvas');
+              c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+              var ctx = c.getContext('2d');
+              return page.render({ canvasContext: ctx, viewport: vp }).promise.then(function () {
+                return classify(c, o).then(function (r) {
+                  agg.Porn = Math.max(agg.Porn, r.scores.Porn);
+                  agg.Sexy = Math.max(agg.Sexy, r.scores.Sexy);
+                  agg.Hentai = Math.max(agg.Hentai, r.scores.Hentai);
+                  agg.ViolenceGore = Math.max(agg.ViolenceGore, r.scores.ViolenceGore);
+                  agg.Neutral = Math.max(agg.Neutral, r.scores.Neutral);
+                  agg.Drawing = Math.max(agg.Drawing, r.scores.Drawing);
+                  aggSkin = Math.max(aggSkin, r.skin);
                 });
-            }
+              });
+            });
+          })(p);
         }
+        return chain.then(function () { return { scores: agg, skin: aggSkin, pages: pages, total: total }; });
+      });
+  }
 
-        // Start animation lifecycle
-        function triggerSimulation() {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-            isAnimating = true;
-            animationStartTime = performance.now();
-            
-            // Reset layouts & physically remove Header / Details panel completely
-            resolvedView.classList.remove('opacity-100', 'translate-y-0');
-            resolvedView.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
-            
-            headerEl.classList.remove('opacity-100');
-            headerEl.classList.add('hidden', 'opacity-0');
-            
-            canvasContainer.style.opacity = '1';
+  function readText(file) {
+    return new Promise(function (res, rej) {
+      var fr = new FileReader();
+      fr.onload = function () { res(String(fr.result)); };
+      fr.onerror = function () { rej(RoboModError('Could not read file as text.', 'text-read')); };
+      fr.readAsText(file);
+    });
+  }
 
-            // Apply titles
-            document.title = `${window.ErrorStatus}. That's an Error.`;
+  // analyze(file, opts) -> Promise<result>.  result.safe is the answer.
+  function analyze(file, o) {
+    o = o || {};
+    if (!file) return Promise.reject(RoboModError('No file given.', 'missing-file'));
+    requireDOM('analyze()');
+    var name = file.name || '', type = file.type || '';
 
-            initParticles();
-            animate(performance.now());
-        }
+    function build(kind, scores, skin, extra) {
+      var services = checkServices(scores);
+      var summary = summarize(services);
+      var assessable = (summary.safe + summary.flagged) > 0;
+      return {
+        safe: summary.flagged === 0,
+        status: summary.flagged > 0 ? 'FLAGGED' : (assessable ? 'SAFE' : 'UNASSESSED'),
+        flagged: summary.flagged > 0,
+        flaggedCount: summary.flagged,
+        safeCount: summary.safe,
+        naCount: summary.na,
+        total: summary.total,
+        assessable: assessable,
+        hasText: !!(extra && extra.hasText),
+        file: { name: name, type: type, size: file.size || 0 },
+        kind: kind,
+        scores: { Porn: scores.Porn != null ? round4(scores.Porn) : null, Sexy: scores.Sexy != null ? round4(scores.Sexy) : null, Hentai: scores.Hentai != null ? round4(scores.Hentai) : null, ViolenceGore: scores.ViolenceGore != null ? round4(scores.ViolenceGore) : null, Neutral: scores.Neutral != null ? round4(scores.Neutral) : null, Drawing: scores.Drawing != null ? round4(scores.Drawing) : null },
+        textScores: {
+          sexual: scores.sexual != null ? round4(scores.sexual) : null,
+          hate: scores.hate != null ? round4(scores.hate) : null,
+          harass: scores.harass != null ? round4(scores.harass) : null,
+          selfharm: scores.selfharm != null ? round4(scores.selfharm) : null,
+          weapons: scores.weapons != null ? round4(scores.weapons) : null,
+          drugs: scores.drugs != null ? round4(scores.drugs) : null
+        },
+        skin: round4(skin),
+        pagesScanned: (extra && extra.pages) || null,
+        totalPages: (extra && extra.total) || null,
+        services: services,
+        summary: summary
+      };
+    }
 
-        // Main Simulation Loop
-        function animate(now) {
-            const elapsed = now - animationStartTime;
-            const w = canvas.width / window.devicePixelRatio;
-            const h = canvas.height / window.devicePixelRatio;
-            const colors = getThemeColors();
-
-            ctx.clearRect(0, 0, w, h);
-
-            if (elapsed < totalAnimationDuration) {
-                const globalProgress = elapsed / totalAnimationDuration;
-
-                // Speed factor accelerates smoothly as atoms move closer to center
-                const speedMult = 0.4 + Math.pow(globalProgress, 2) * 2.8;
-
-                // Calculate spiral contraction smoothly
-                const spiralScale = 2.5 - (2.1 * Math.pow(globalProgress, 1.5));
-
-                if (globalProgress < assemblyPoint) {
-                    // Phase 1: Orbiting swarms with extreme continuous acceleration
-                    particles.forEach(p => {
-                        p.angle += p.angleSpeed * speedMult;
-                        
-                        const currentRadX = p.orbitRadiusX * spiralScale;
-                        const currentRadY = p.orbitRadiusY * spiralScale;
-
-                        const rawX = Math.cos(p.angle) * currentRadX;
-                        const rawY = Math.sin(p.angle) * currentRadY;
-
-                        p.x = w / 2 + (rawX * Math.cos(p.tilt) - rawY * Math.sin(p.tilt));
-                        p.y = h / 2 + (rawX * Math.sin(p.tilt) + rawY * Math.cos(p.tilt));
-
-                        // Trajectory markers
-                        ctx.fillStyle = colors.particleTrace;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
-                        ctx.fill();
-
-                        // Render Helvetica Plain text dynamic error code particle (matches active code status)
-                        ctx.font = `500 ${p.size}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-                        ctx.fillStyle = colors.particleColor;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(window.ErrorStatus, p.x, p.y);
-                    });
-                } else {
-                    // Phase 2: Assemble cleanly using continuous mathematical position maps
-                    const assemblyProgress = (globalProgress - assemblyPoint) / (1 - assemblyPoint);
-                    const assembleWeight = Math.min(1.0, Math.pow(assemblyProgress, 1.5));
-                    
-                    const textScale = Math.min(w * 0.45, h * 0.45) * (1.1 - assemblyProgress * 0.1); 
-                    const alpha = Math.max(0, 1.0 - assemblyProgress);
-
-                    particles.forEach(p => {
-                        // Keep calculating continuous orbital coordinate path exactly as Phase 1
-                        p.angle += p.angleSpeed * speedMult;
-                        const currentRadX = p.orbitRadiusX * spiralScale;
-                        const currentRadY = p.orbitRadiusY * spiralScale;
-
-                        const rawX = Math.cos(p.angle) * currentRadX;
-                        const rawY = Math.sin(p.angle) * currentRadY;
-
-                        const orbitX = w / 2 + (rawX * Math.cos(p.tilt) - rawY * Math.sin(p.tilt));
-                        const orbitY = h / 2 + (rawX * Math.sin(p.tilt) + rawY * Math.cos(p.tilt));
-
-                        const targetX = w / 2 + p.tx * textScale;
-                        const targetY = h / 2 + p.ty * textScale;
-
-                        // Interpolate between continuous orbit position and static target text position
-                        // This prevents any structural "jump" at the border point
-                        const finalX = orbitX + (targetX - orbitX) * assembleWeight;
-                        const finalY = orbitY + (targetY - orbitY) * assembleWeight;
-
-                        ctx.font = `500 ${p.size * (1.0 + assembleWeight * 0.25)}px "Helvetica Neue", "Helvetica", "Arial", sans-serif`;
-                        ctx.fillStyle = colors.particleColor.replace('0.9', (0.9 * alpha).toString());
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(window.ErrorStatus, finalX, finalY);
-                    });
-                }
-
-                animationFrameId = requestAnimationFrame(animate);
-
-            } else {
-                // Final static resolved state
-                isAnimating = false;
-                
-                const currentMeta = httpErrorDatabase[window.ErrorStatus] || { 
-                    title: "Status Override", 
-                    desc: "Interactive status error triggered." 
-                };
-
-                resolvedCode.textContent = window.ErrorStatus;
-                resolvedStatusText.textContent = "That's an Error.";
-                resolvedDesc.textContent = currentMeta.desc;
-
-                // Bring elements in gracefully post animation
-                resolvedView.classList.remove('pointer-events-none');
-                resolvedView.classList.add('opacity-100', 'translate-y-0');
-
-                // Bring the header physically back into the DOM layout, trigger a tiny browser reflow, and fade it in
-                headerEl.classList.remove('hidden');
-                void headerEl.offsetHeight; // Forces browser paint update
-                headerEl.classList.add('opacity-100');
-
-                canvasContainer.style.opacity = '0.05';
-            }
-        }
-
-        // System Dark Mode Listeners & Layout Sync
-        function checkTheme() {
-            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            if (!isAnimating) drawStaticState();
-        }
-
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', checkTheme);
-        checkTheme();
-
-        // Trigger simulation on startup
-        window.addEventListener('load', () => {
-            triggerSimulation();
+    return sniffKind(file).then(function (kind) {
+      if (kind === 'video') {
+        return firstFrame(file).then(function (c) {
+          return classify(c, o).then(function (r) { return build('video', r.scores, r.skin); });
         });
-    </script>
-</body>
+      }
+      if (kind === 'audio') {
+        return audioScores(file).then(function (s) { return build('audio', s, 0); });
+      }
+      if (kind === 'pdf') {
+        return pdfScores(file, o).then(function (r) { return build('pdf', r.scores, r.skin, { pages: r.pages, total: r.total }); });
+      }
+      if (kind === 'text') {
+        return readText(file).then(function (txt) {
+          var ts = scanText(txt);
+          var s = { Porn: 0, Sexy: 0, Hentai: 0, ViolenceGore: 0, Neutral: 1, Drawing: 0, sexual: ts.sexual, hate: ts.hate, harass: ts.harass, selfharm: ts.selfharm, weapons: ts.weapons, drugs: ts.drugs };
+          return build('text', s, 0, { hasText: true });
+        });
+      }
+      if (kind === 'image') {
+        return loadImage(file).then(function (img) {
+          return classify(img, o).then(function (r) { return build('image', r.scores, r.skin); });
+        });
+      }
+      return build('binary', {}, 0, { hasText: false });
+    });
+  }
+
+  // check(file, opts) -> Promise<boolean>.  true = safe, false = flagged.
+  // This is the whole point: "just say if it is safe or not".
+  function check(file, o) {
+    return analyze(file, o).then(function (r) { return r.safe; });
+  }
+
+  /* ------------------------------------------------------------ *
+   *  Public API — no UI, no warnings rendered. Just the verdict.
+   * ------------------------------------------------------------ */
+  var API = {
+    version: VERSION,
+    defaults: DEFAULTS,
+    groups: GROUPS,
+    services: BRAND.services,
+    Error: RoboModError,
+    check: check,
+    analyze: analyze,
+    classify: classify,
+    checkServices: checkServices,
+    summarize: summarize,
+    verdict: verdict,
+    scanText: scanText
+  };
+
+  /* ------------------------------------------------------------ *
+   *  postMessage bridge — pure methods only (no File objects).
+   *     iframe.contentWindow.postMessage({robomod:1, id:'x', method:'verdict',
+   *                                       args:[{Porn:0.9,Sexy:0.6,...}]}, '*')
+   *  Reply: {robomod:1, id:'x', ok:true, result:...} or {ok:false, error, code}
+   * ------------------------------------------------------------ */
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('message', function (ev) {
+      var m = ev.data;
+      if (!m || m.robomod !== 1 || !m.method) return;
+      var reply = function (payload) {
+        payload.robomod = 1; payload.id = m.id;
+        try { ev.source.postMessage(payload, ev.origin === 'null' ? '*' : ev.origin); } catch (e) {}
+      };
+      var fn = API[m.method];
+      if (typeof fn !== 'function') { reply({ ok: false, error: 'Unknown method: ' + m.method, code: 'bad-method' }); return; }
+      try {
+        Promise.resolve(fn.apply(API, m.args || [])).then(function (r) {
+          reply({ ok: true, result: r });
+        }, function (e) {
+          reply({ ok: false, error: e.message || String(e), code: e.code || 'error' });
+        });
+      } catch (e) {
+        reply({ ok: false, error: e.message || String(e), code: e.code || 'error' });
+      }
+    });
+  }
+
+  return API;
+})();
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = RoboModFactory;
+  module.exports.default = RoboModFactory;
+} else if (typeof define === 'function' && define.amd) {
+  define(function () { return RoboModFactory; });
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.RoboMod = RoboModFactory;
+}
+
+</script>
+  <script>
+    const $=id=>document.getElementById(id), startButton=$('startButton'),landing=$('landing'),formFlow=$('formFlow'),qZero=$('questionZero'),qOne=$('questionOne'),qTwo=$('questionTwo'),qThree=$('questionThree'),qFour=$('questionFour'),qFive=$('questionFive'),qSix=$('questionSix'),next=$('nextButton'),restart=$('restartButton'),issue=$('issueDescription'),recreate=$('recreateDescription'),details=$('recreateDetails'),studentName=$('studentName'),grade=$('grade'),classroom=$('classroom'),gradeRoom=$('gradeRoomQuestion'),classroomQuestion=$('classroomQuestion'),cameraPreview=$('cameraPreview'),capturedPhoto=$('capturedPhoto'),cameraMessage=$('cameraMessage'),floorMap=$('floorMap'),mapPanel=$('mapPanel'),mapMarker=$('mapMarker'),mapPlaceholder=$('mapPlaceholder'),mapModal=$('mapModal'),modalFloorMap=$('modalFloorMap'),modalMapWrap=$('modalMapWrap'),modalMarker=$('modalMarker'),mapViewport=$('mapViewport');
+    const siteHeader=$('siteHeader'), loginModal=$('loginModal'); let headerClicks=0;
+    siteHeader.addEventListener('click',()=>{if(landing.classList.contains('hidden'))return;headerClicks++;if(headerClicks>=25){headerClicks=0;loginModal.classList.remove('hidden');loginModal.classList.add('flex');$('loginUsername').focus()}});
+    $('closeLoginModal').addEventListener('click',()=>{loginModal.classList.add('hidden');loginModal.classList.remove('flex')});
+    window.caseStorage={status:()=>fetch('/api/storage/status').then(response=>response.json()),upload:async(caseId,file)=>{const base64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)});const response=await fetch('/api/storage/upload',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({caseId,filename:file.name,contentType:file.type,base64})});if(!response.ok)throw new Error((await response.json()).error||'Upload failed');return response.json()}};
+    async function createBlueMapFile(){const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=900;const ctx=canvas.getContext('2d');ctx.fillStyle='#0f172a';ctx.fillRect(0,0,canvas.width,canvas.height);try{if(floorMap.src){const image=await new Promise((resolve,reject)=>{const img=new Image();img.crossOrigin='anonymous';img.onload=()=>resolve(img);img.onerror=reject;img.src=floorMap.src});const scale=Math.min(canvas.width/image.naturalWidth,canvas.height/image.naturalHeight);const width=image.naturalWidth*scale,height=image.naturalHeight*scale,left=(canvas.width-width)/2,top=(canvas.height-height)/2;ctx.drawImage(image,left,top,width,height);if(mapLocation){const x=left+width*mapLocation.x/100,y=top+height*mapLocation.y/100;ctx.fillStyle='#2563eb';ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke()}}}catch(error){ctx.fillStyle='#e2e8f0';ctx.font='bold 34px Helvetica, Arial, sans-serif';ctx.fillText(classroom.value?classroom.options[classroom.selectedIndex].text:'Selected floor',40,70);if(mapLocation)ctx.fillText('Pinned location: '+mapLocation.x.toFixed(1)+'%, '+mapLocation.y.toFixed(1)+'%',40,120)}const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));return new File([blob],'blumap.png',{type:'image/png'})}
+    async function createCaseResources(){const questionnaire={formName:'dataform',questions:[{name:studentName.value.trim(),grade:grade.value||null,floor:classroom.value?classroom.options[classroom.selectedIndex].text:null},{userReportedOs:selectedOS||null,userDetectedOs:userDetectedOS||null,isSameDevice:selectedDevice==='same'?'true':selectedDevice==='different'?'false':null},{deviceIssue:issue.value.trim()},{'isIssueRe-creatable':recreateAnswer==='yes'?'true':recreateAnswer==='no'?'false':null,stepsToCreateIssue:recreateAnswer==='yes'?recreate.value.trim():null}]};const questionnaireFile=new File([JSON.stringify(questionnaire,null,2)],'questionnaire.json',{type:'application/json'});await addResourceFile(questionnaireFile,false,true,true);let blob;if(capturedPhoto.src){blob=await fetch(capturedPhoto.src).then(response=>response.blob())}else{const canvas=document.createElement('canvas');canvas.width=canvas.height=1;canvas.getContext('2d').fillRect(0,0,1,1);blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'))}await addResourceFile(new File([blob],'persona.png',{type:'image/png'}));await addResourceFile(await createBlueMapFile(),false,false,true)}
+    $('loginButton').addEventListener('click',async()=>{const username=$('loginUsername'),password=$('loginPassword'),dialog=$('loginDialog');let valid=false;try{const response=await fetch('/api/auth/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:username.value.trim(),password:password.value})});valid=response.ok}catch(error){}if(valid){loginModal.classList.add('hidden');loginModal.classList.remove('flex');const basicInfo=$('basicInformation'),locationText=callerLocation?callerLocation.latitude+', '+callerLocation.longitude:'Unavailable';basicInfo.value='Caller Name: '+(studentName.value.trim()||'—')+'\nGrade: '+(grade.value||'—')+'\nOperating System: '+(selectedOS||'—')+'\nIP Address: '+(callerIp||'Unavailable')+'\nLocation: '+locationText;if(callerLocation){const lat=Number(callerLocation.latitude),lon=Number(callerLocation.longitude);$('callerMap').src='https://www.google.com/maps?q='+encodeURIComponent(lat+','+lon)+'&z=14&output=embed'}$('headerProgramText').textContent='Mills Park Middle School Tech Assistance Program (Responder)';document.title='Mills Park Tech Assistance (Responder)';const arc=$('architectureValue');const platform=navigator.platform||navigator.userAgent;arc.textContent=/arm|aarch/i.test(platform)?'ARM':/64|x86|win|intel/i.test(platform)?'X64':'UNKNOWN';if(navigator.userAgentData?.getHighEntropyValues){navigator.userAgentData.getHighEntropyValues(['architecture']).then(data=>{if(data.architecture)arc.textContent=data.architecture.toUpperCase()}).catch(()=>{})}accessibilityButton.classList.add('hidden');$('responderSubheader').classList.remove('hidden');$('mainContent').classList.add('hidden');$('adminScreen').classList.remove('hidden');return}username.classList.add('border-red-500');password.classList.add('border-red-500');dialog.classList.remove('shake');void dialog.offsetWidth;dialog.classList.add('shake')});
+    const responderNotes=$('responderNotes');
+    responderNotes.addEventListener('focus',()=>{if(!responderNotes.value)responderNotes.value='> '});
+    responderNotes.addEventListener('input',()=>{const position=responderNotes.selectionStart,current=responderNotes.value;const updated=current.split('\n').map(line=>line.startsWith('>')?line:'> '+line).join('\n');if(updated!==current){responderNotes.value=updated;const nextPosition=position+(updated.length-current.length);responderNotes.selectionStart=responderNotes.selectionEnd=nextPosition}});
+    const chatMessages=$('chatMessages'),chatComposer=$('chatComposer'),sendChatButton=$('sendChatButton');
+    function addChatMessage(text,fromSelf=false,name=''){if(!text.trim())return;const row=document.createElement('div');row.className='chat-enter mb-3 flex shrink-0 '+(fromSelf?'justify-end':'justify-start');const group=document.createElement('div');group.className=fromSelf?'max-w-[80%]':'max-w-[80%]';if(!fromSelf&&name){const label=document.createElement('div');label.className='mb-1 text-[10px] font-medium text-slate-500 dark:text-slate-400';label.textContent=name;group.append(label)}const bubble=document.createElement('div');bubble.className=fromSelf?'rounded-2xl bg-black px-4 py-3 text-sm text-white dark:bg-white dark:text-black':'rounded-2xl bg-slate-200 px-4 py-3 text-sm text-black dark:bg-slate-700 dark:text-white';bubble.textContent=text;group.append(bubble);row.append(group);chatMessages.append(row);chatMessages.scrollTop=chatMessages.scrollHeight}
+    function sendChat(){addChatMessage(chatComposer.value,true);chatComposer.value='';chatComposer.focus()}
+    $('shareScreenRequestButton').addEventListener('click',()=>{const row=document.createElement('div');row.className='chat-enter mb-3 flex shrink-0 justify-end';const outer=document.createElement('div');outer.className='w-full max-w-lg rounded-2xl bg-black p-4 dark:bg-white';outer.innerHTML='<div class="flex items-center gap-3 rounded-xl border-2 border-slate-200 bg-white p-3 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"><span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"><svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="13" height="10" rx="2"/><path d="m16 8 5-3v8l-5-3zM8 18h8M12 14v4"/></svg></span><span class="min-w-0 flex-1 text-sm font-bold">Share Screen Request</span></div>';row.append(outer);chatMessages.append(row);chatMessages.scrollTop=chatMessages.scrollHeight});
+    let uploadTestDeadline=0, uploadTestInput='';$('fileUploadRequestButton').addEventListener('click',()=>{uploadTestDeadline=Date.now()+5000;uploadTestInput='';const row=document.createElement('div');row.className='chat-enter mb-3 flex shrink-0 justify-end';const outer=document.createElement('div');outer.className='w-full max-w-lg rounded-2xl bg-black p-4 dark:bg-white';outer.innerHTML='<div class="flex items-center gap-3 rounded-xl border-2 border-slate-200 bg-white p-3 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"><span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xl dark:bg-slate-800">⇧</span><span class="min-w-0 flex-1 text-sm font-bold">Upload Files</span></div>';row.append(outer);chatMessages.append(row);chatMessages.scrollTop=chatMessages.scrollHeight});window.addEventListener('keydown',event=>{if(Date.now()>uploadTestDeadline||event.key.length!==1)return;uploadTestInput=(uploadTestInput+event.key).slice(-12);if(uploadTestInput.endsWith('@@@NSFW@@@')||uploadTestInput.endsWith('###File###')){const flagged=uploadTestInput.endsWith('@@@NSFW@@@'),canvas=document.createElement('canvas');canvas.width=canvas.height=32;const ctx=canvas.getContext('2d');ctx.fillStyle='black';ctx.fillRect(0,0,32,32);canvas.toBlob(blob=>addResourceFile(new File([blob],flagged?'nsfwtest.png':'filetest.png',{type:'image/png'}),flagged));uploadTestDeadline=0}});
+    sendChatButton.addEventListener('click',sendChat);chatComposer.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}});
+    window.receiveChatMessage=(name,message)=>addChatMessage(message,false,name);
+    const transferButton=$('transferButton'), dispatchButton=$('dispatchButton'); let serviceActionMode=null;
+    function setServiceActionMode(mode){serviceActionMode=serviceActionMode===mode?null:mode;[transferButton,dispatchButton].forEach(button=>{const active=serviceActionMode===button.dataset.mode;button.classList.toggle('border-blue-600',active);button.classList.toggle('bg-blue-600',active);button.classList.toggle('border-black',!active);button.classList.toggle('bg-black',!active)});document.querySelectorAll('.service-actions').forEach(actions=>{const [chat,request]=actions.querySelectorAll('button');if(serviceActionMode){chat.textContent=serviceActionMode;chat.classList.add('h-full');request.classList.add('hidden')}else{chat.textContent='Chat';chat.classList.remove('h-full');request.classList.remove('hidden')}})}
+    transferButton.dataset.mode='Transfer';dispatchButton.dataset.mode='Dispatch';transferButton.addEventListener('click',()=>setServiceActionMode('Transfer'));dispatchButton.addEventListener('click',()=>setServiceActionMode('Dispatch'));
+    let activeServiceChat=null;document.querySelectorAll('.service-actions button:first-child').forEach(button=>button.addEventListener('click',()=>{if(serviceActionMode){setServiceActionMode(serviceActionMode);return}const card=button.closest('.service-card');activeServiceChat=card.querySelector('.min-w-0').textContent.trim();document.querySelectorAll('.service-card').forEach(item=>{const active=item===card;item.classList.toggle('ring-2',active);item.classList.toggle('ring-blue-600',active);item.querySelector('.service-actions button:first-child').classList.toggle('border-blue-600',active);item.querySelector('.service-actions button:first-child').classList.toggle('bg-blue-600',active)});chatMessages.innerHTML=''}));
+    $('authorizeMediaCenterButton').addEventListener('click',event=>{const button=event.currentTarget;button.closest('.flex.flex-col.gap-3').querySelectorAll('button').forEach(control=>{if(control.textContent.trim()!=='Disconnect'){control.disabled=true;control.classList.add('cursor-not-allowed','opacity-50')}});const row=document.createElement('div');row.className='chat-enter mb-3 flex shrink-0 justify-end';const outer=document.createElement('div');outer.className='w-full max-w-lg rounded-2xl bg-black p-4 dark:bg-white';outer.innerHTML='<div class="flex items-center gap-3 rounded-xl border-2 border-slate-200 bg-white p-3 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"><span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-white"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><span class="min-w-0 flex-1 text-sm font-bold">Copy Case ID and head to Media Center</span></div>';row.append(outer);chatMessages.append(row);chatMessages.scrollTop=chatMessages.scrollHeight});
+    const accessibilityButton=$('accessibilityButton');
+    function clearHighlights(){document.querySelectorAll('.tts-highlight').forEach(el=>el.classList.remove('tts-highlight'))}
+    function setReaderState(reading){accessibilityButton.classList.toggle('rounded-full',!reading);accessibilityButton.classList.toggle('rounded-lg',reading);accessibilityButton.classList.toggle('bg-red-600',reading);accessibilityButton.classList.toggle('text-white',reading);accessibilityButton.setAttribute('aria-label',reading?'Stop reading':'Read this screen aloud');accessibilityButton.title=reading?'Stop reading':'Read this screen aloud';accessibilityButton.innerHTML=reading?'<span class="text-base font-bold" aria-hidden="true">■</span>':'<svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor"><path d="M3 10v4h4l5 4V6l-5 4H3zm11.5 2A3.5 3.5 0 0 0 12 8.65v1.9a1.6 1.6 0 0 1 0 2.9v1.9a3.5 3.5 0 0 0 2.5-3.35zm0-7.18v2.06a5.5 5.5 0 0 1 0 10.24v2.06a7.5 7.5 0 0 0 0-14.36z"/></svg>'}
+    function readCurrentScreen(){
+      if(!('speechSynthesis' in window))return;
+      window.speechSynthesis.cancel();clearHighlights();
+      let elements=[], supplemental=[];
+      if(!formFlow.classList.contains('hidden')){
+        if(readerContext==='device'){elements.push(qOne.querySelector('h1'));supplemental.push('This is a multiple choice input. Your options are ChromeOS, iPadOS, and Windows.'+(selectedOS?' You have selected '+selectedOS+'.':'')+' The device you are using is running '+(detectOS()||'an unknown operating system')+', so we recommend selecting this option if this is your current device.'+(selectedOS&&selectedDevice?' You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.':''));}
+        else if(readerContext==='grade'){elements.push($('gradeRoomQuestion').querySelector('h2'));supplemental.push('This is a dropdown input. Your options are Grade 6, Grade 7, and Grade 8.'+(grade.value?' You have selected '+grade.value+'.':''));}
+        else if(readerContext==='issue'){elements.push(qThree.querySelector('h1'));supplemental.push('This is a text input. The minimum required characters is 20 and the maximum is 5000. This text box accepts letters, numbers, punctuation, spaces, and other standard keyboard characters.'+(validText(issue)?' You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.':''));}
+        else if(readerContext==='recreate'){elements.push(details.querySelector('h2'));supplemental.push('This is a text input. The minimum required characters is 20 and the maximum is 5000. This text box accepts letters, numbers, punctuation, spaces, and other standard keyboard characters.'+(validText(recreate)?' You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.':''));}
+        else if(readerContext==='floor'){elements.push($('classroomQuestion').querySelector('h2'));supplemental.push('This is a dropdown input. Your options are Floor 1, Floor 2, and Floor 3.'+(classroom.value?' You have selected '+classroom.options[classroom.selectedIndex].text+'.':'')+' This question also requires you to select an approximate location of where you are on '+(classroom.value?classroom.options[classroom.selectedIndex].text:'the selected floor')+'. The screen reader is unable to read images, so please contact your nearest teacher for help.');}
+        else if(readerContext==='photo'){elements.push(qFive.querySelector('h1'),$('retakeButton'),...qFive.querySelectorAll('p'));supplemental.push('You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.');}
+        else {
+        if(currentStep===0){if(!studentName.value.trim()){elements.push($('questionZero').querySelector('h1'));supplemental.push('This is a text input. The minimum required characters is 3 and the maximum is 35. This text box accepts letters, numbers, spaces, apostrophes, hyphens, and other standard keyboard characters.')}if(studentName.value.trim().length>=3&&!grade.value){elements.push($('gradeRoomQuestion').querySelector('h2'));supplemental.push('This is a dropdown input. Your options are Grade 6, Grade 7, and Grade 8.')}if(grade.value&&(!classroom.value||!mapSelected)){elements.push($('classroomQuestion').querySelector('h2'));supplemental.push('This is a dropdown input. Your options are Floor 1, Floor 2, and Floor 3.'+(classroom.value?' You have selected '+classroom.options[classroom.selectedIndex].text+'.':'')+' This question also requires you to select an approximate location of where you are on '+(classroom.value?classroom.options[classroom.selectedIndex].text:'the selected floor')+'. The screen reader is unable to read images, so please contact your nearest teacher for help.')}if(grade.value) supplemental.push('You have selected '+grade.value+'.')}
+        else if(currentStep===1){if(!selectedOS){elements.push(qOne.querySelector('h1'));supplemental.push('This is a multiple choice input. Your options are ChromeOS, iPadOS, and Windows. The device you are using is running '+(detectOS()||'an unknown operating system')+', so we recommend selecting this option if this is your current device.')}if(!qTwo.classList.contains('hidden')){elements.push(qTwo.querySelector('h2'));supplemental.push('This is a multiple choice input. Your options are This is the same device experiencing the issue, and This is a different device that is reporting on behalf of a different device.')}if(selectedOS)supplemental.push('You have selected '+selectedOS+'.');if(selectedDevice)supplemental.push('You have selected '+(selectedDevice==='same'?'This is the same device experiencing the issue':'This is a different device that is reporting on behalf of a different device')+'.');if(selectedOS&&selectedDevice)supplemental.push('You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.')}
+        else if(currentStep===3&&!validText(issue)){elements.push(qThree.querySelector('h1'));supplemental.push('This is a text input. The minimum required characters is 20 and the maximum is 5000. This text box accepts letters, numbers, punctuation, spaces, and other standard keyboard characters.')}
+        else if(currentStep===4){if(!recreateAnswer){elements.push(qFour.querySelector('h1'));supplemental.push('This is a multiple choice input. Your options are Yes and No.');}else if(recreateAnswer==='yes'&&!validText(recreate)){supplemental.push('You have selected Yes.');elements.push(details.querySelector('h2'));supplemental.push('This is a text input. The minimum required characters is 20 and the maximum is 5000. This text box accepts letters, numbers, punctuation, spaces, and other standard keyboard characters.')}else if(recreateAnswer==='no')supplemental.push('You have selected No.');if(recreateAnswer==='no'||(recreateAnswer==='yes'&&validText(recreate)))supplemental.push('You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.');}
+        else if(currentStep===5){elements.push(qFive.querySelector('h1'),...(photoTaken?[$('retakeButton')]:[$('captureButton')]),...qFive.querySelectorAll('p'));if(photoTaken)supplemental.push('You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.');}else if(currentStep===6){elements.push(qSix.querySelector('h1'),...qSix.querySelectorAll('p'),next);}
+        }
+      } else elements=[$('form-title'),startButton,...landing.querySelectorAll('p')];
+      const words=[], spokenWords=[];
+      elements.filter(Boolean).forEach(el=>{const text=(el.innerText||el.textContent).trim();if(el.tagName==='BUTTON'){spokenWords.push('Button:');text.split(/\s+/).filter(Boolean).forEach(part=>{spokenWords.push(part);words.push(null)});return}const fragment=document.createDocumentFragment();text.split(/(\s+)/).forEach(part=>{if(/\S/.test(part)){const span=document.createElement('span');span.textContent=part;fragment.append(span);words.push(span);spokenWords.push(part)}else fragment.append(document.createTextNode(part))});el.textContent='';el.append(fragment)});
+      supplemental.forEach(text=>text.split(/\s+/).filter(Boolean).forEach(word=>{spokenWords.push(word);words.push(null)}));
+      const utterance=new SpeechSynthesisUtterance(spokenWords.join(' '));utterance.rate=.95;
+      utterance.onboundary=event=>{const before=utterance.text.slice(0,event.charIndex).trim(),index=before?before.split(/\s+/).length:0;clearHighlights();const word=words[Math.min(index,words.length-1)];if(word){word.classList.add('tts-highlight');word.scrollIntoView({block:'nearest'})}};
+      utterance.onend=()=>{clearHighlights();setReaderState(false)};setReaderState(true);window.speechSynthesis.speak(utterance);
+    }
+    accessibilityButton.addEventListener('click',()=>{if(window.speechSynthesis&&window.speechSynthesis.speaking){window.speechSynthesis.cancel();clearHighlights();setReaderState(false)}else readCurrentScreen()});
+    let selectedOS=null,userDetectedOS=null,selectedDevice=null,recreateAnswer=null,currentStep=0,mapSelected=false,mapLocation=null,photoTaken=false,cameraStream=null,readerContext=null,callerIp=null,callerLocation=null;
+    const dateFormat={month:'long',day:'numeric',year:'numeric'};
+    const today=new Date(), threeDays=new Date(today), oneMonth=new Date(today);
+    threeDays.setDate(today.getDate()+3); oneMonth.setMonth(today.getMonth()+1);
+    $('threeDaysDate').textContent=threeDays.toLocaleDateString(undefined,dateFormat);
+    $('oneMonthDate').textContent=oneMonth.toLocaleDateString(undefined,dateFormat);
+    const detectOS=()=>{const u=navigator.userAgent||navigator.platform||'';return /CrOS/i.test(u)?'ChromeOS':/iPad|Macintosh.*Mobile/i.test(u)?'iPadOS':/Windows/i.test(u)?'Windows':null};
+    const validText=t=>t.value.trim().length>=20;
+    function updateNext(){const ready=currentStep===0?(studentName.value.trim().length>=3&&grade.value&&classroom.value&&mapSelected):currentStep===1?selectedOS&&selectedDevice:currentStep===3?validText(issue):currentStep===4?(recreateAnswer==='no'||(recreateAnswer==='yes'&&validText(recreate))):photoTaken;const wasHidden=next.classList.contains('hidden');next.classList.toggle('hidden',!ready);restart.classList.toggle('hidden',ready);if(ready&&wasHidden&&window.speechSynthesis&&window.speechSynthesis.speaking){window.speechSynthesis.cancel();const notice=new SpeechSynthesisUtterance('You have completed all of the questions on this page. A Next button is now available. When you click it, you will go to the next page. You may change your answers if the data entered was incorrect.');notice.rate=.95;notice.onend=()=>{clearHighlights();setReaderState(false)};setReaderState(true);window.speechSynthesis.speak(notice)}}
+    function updateCounter(text,min,max,minimum,maximum){const n=text.value.length;min.textContent=`${n}/${minimum} minimum characters`;max.textContent=`${n}/${maximum} maximum characters`;min.className=n>=minimum?'text-emerald-600 dark:text-emerald-400':'text-red-600 dark:text-red-400';max.className=n>=maximum?'text-red-600 dark:text-red-400':'text-slate-500 dark:text-slate-400'}
+    studentName.addEventListener('focus',()=>readerContext='name');
+    grade.addEventListener('focus',()=>readerContext='grade');
+    classroom.addEventListener('focus',()=>readerContext='floor');
+    issue.addEventListener('focus',()=>readerContext='issue');recreate.addEventListener('focus',()=>readerContext='recreate');
+    document.querySelectorAll('[data-os]').forEach(b=>b.addEventListener('click',()=>readerContext='device'));
+    $('classroomQuestion').addEventListener('click',()=>readerContext='floor');$('gradeRoomQuestion').addEventListener('click',()=>readerContext='grade');
+    function captureCallerIp(){const primary=()=>fetch('https://ipwho.is/').then(response=>response.ok?response.json():Promise.reject()).then(data=>{if(!data.success||!data.ip)throw new Error('No IP');return {ip:data.ip,latitude:data.latitude,longitude:data.longitude}});const fallback=()=>fetch('https://ipapi.co/json/').then(response=>response.ok?response.json():Promise.reject()).then(data=>{if(!data.ip)throw new Error('No IP');return {ip:data.ip,latitude:data.latitude,longitude:data.longitude}});primary().catch(fallback).then(data=>{callerIp=data.ip;callerLocation=(data.latitude!=null&&data.longitude!=null)?{latitude:data.latitude,longitude:data.longitude}:null}).catch(()=>{callerIp=null;callerLocation=null})}
+    startButton.addEventListener('click',()=>{captureCallerIp();landing.classList.add('hidden');formFlow.classList.remove('hidden');restart.classList.remove('hidden');studentName.focus()});
+    studentName.addEventListener('input',()=>{updateCounter(studentName,$('nameMinimumCounter'),$('nameMaximumCounter'),3,35);if(studentName.value.trim().length>=3&&gradeRoom.classList.contains('hidden')){gradeRoom.classList.remove('hidden');gradeRoom.classList.add('reveal')}updateNext()});
+    grade.addEventListener('change',()=>{if(grade.value&&classroomQuestion.classList.contains('hidden')){classroomQuestion.classList.remove('hidden');classroomQuestion.classList.add('reveal')}updateNext()});
+    let mapZoom=1, baseMapWidth=0;
+    const floorMaps={floor1:'https://raw.githubusercontent.com/aswartzlander2-sys/Mills-Park-Middle-School-Projects/main/assets/floorplan/floor1_enhanced.png',floor2:'https://raw.githubusercontent.com/aswartzlander2-sys/Mills-Park-Middle-School-Projects/main/assets/floorplan/secondfloor.png',floor3:'https://raw.githubusercontent.com/aswartzlander2-sys/Mills-Park-Middle-School-Projects/main/assets/floorplan/thirdfloor_enhanced.png'};
+    function applyZoom(){if(!baseMapWidth)baseMapWidth=Math.max(800,mapViewport.clientWidth-32);const width=baseMapWidth*mapZoom;modalFloorMap.style.width=width+'px';modalMapWrap.style.width=width+'px';}
+    modalFloorMap.addEventListener('load',()=>{baseMapWidth=Math.max(800,mapViewport.clientWidth-32);applyZoom()});
+    classroom.addEventListener('change',()=>{mapSelected=false;mapLocation=null;mapMarker.classList.add('hidden');modalMarker.classList.add('hidden');const src=floorMaps[classroom.value];if(src){baseMapWidth=0;floorMap.src=src;modalFloorMap.src=src;floorMap.classList.remove('hidden');mapPlaceholder.classList.add('hidden')}else{floorMap.classList.add('hidden');mapPlaceholder.classList.remove('hidden')}updateNext()});
+    mapPanel.addEventListener('click',()=>{if(!classroom.value)return;mapZoom=1;applyZoom();mapModal.classList.remove('hidden');mapViewport.scrollTo(0,0)});
+    $('closeMapModal').addEventListener('click',()=>mapModal.classList.add('hidden'));
+    $('zoomIn').addEventListener('click',()=>{mapZoom=Math.min(3,mapZoom+.25);applyZoom()});
+    $('zoomOut').addEventListener('click',()=>{mapZoom=Math.max(.75,mapZoom-.25);applyZoom()});
+    mapViewport.addEventListener('wheel',event=>{if(!event.ctrlKey)return;event.preventDefault();mapZoom=Math.max(.75,Math.min(3,mapZoom+(event.deltaY<0?.15:-.15)));applyZoom()},{passive:false});
+    let panStart=null, suppressMapClick=false;
+    mapViewport.style.cursor='grab';
+    mapViewport.addEventListener('pointerdown',event=>{if(mapZoom<=1||event.button!==0)return;panStart={x:event.clientX,y:event.clientY,left:mapViewport.scrollLeft,top:mapViewport.scrollTop,moved:false};mapViewport.setPointerCapture(event.pointerId);mapViewport.style.cursor='grabbing'});
+    mapViewport.addEventListener('pointermove',event=>{if(!panStart)return;const dx=event.clientX-panStart.x,dy=event.clientY-panStart.y;if(Math.abs(dx)>3||Math.abs(dy)>3)panStart.moved=true;mapViewport.scrollLeft=panStart.left-dx;mapViewport.scrollTop=panStart.top-dy});
+    function endPan(){if(!panStart)return;if(panStart.moved){suppressMapClick=true;setTimeout(()=>suppressMapClick=false,0)}panStart=null;mapViewport.style.cursor='grab'}
+    mapViewport.addEventListener('pointerup',endPan);mapViewport.addEventListener('pointercancel',endPan);
+    mapViewport.addEventListener('click',event=>{if(suppressMapClick)return;const box=modalFloorMap.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)return;const x=Math.max(0,Math.min(100,(event.clientX-box.left)/box.width*100));const y=Math.max(0,Math.min(100,(event.clientY-box.top)/box.height*100));modalMarker.style.left=x+'%';modalMarker.style.top=y+'%';mapLocation={x,y};modalMarker.classList.remove('hidden');const panel=mapPanel.getBoundingClientRect(),ratio=floorMap.naturalWidth/floorMap.naturalHeight;let displayedWidth=panel.width,displayedHeight=panel.width/ratio;if(displayedHeight>panel.height){displayedHeight=panel.height;displayedWidth=panel.height*ratio}const offsetX=(panel.width-displayedWidth)/2,offsetY=(panel.height-displayedHeight)/2;mapMarker.style.left=((offsetX+x/100*displayedWidth)/panel.width*100)+'%';mapMarker.style.top=((offsetY+y/100*displayedHeight)/panel.height*100)+'%';mapMarker.classList.remove('hidden');mapSelected=true;updateNext()});
+    document.querySelectorAll('[data-os]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-os]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selectedOS=b.dataset.os;if(qTwo.classList.contains('hidden')){qTwo.classList.remove('hidden');qTwo.classList.add('reveal')}updateNext()}));
+    document.querySelectorAll('[data-device-answer]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-device-answer]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selectedDevice=b.dataset.deviceAnswer;updateNext()}));
+    issue.addEventListener('input',()=>{updateCounter(issue,$('minimumCounter'),$('maximumCounter'),20,5000);updateNext()});
+    document.querySelectorAll('[data-recreate]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-recreate]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');recreateAnswer=b.dataset.recreate;if(recreateAnswer==='yes'){details.classList.remove('hidden');details.classList.add('reveal');recreate.focus()}else details.classList.add('hidden');updateNext()}));
+    recreate.addEventListener('input',()=>{updateCounter(recreate,$('recreateMinimumCounter'),$('recreateMaximumCounter'),20,5000);updateNext()});
+    async function startCamera(){try{if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraMessage.textContent='Requesting camera access…';cameraMessage.classList.remove('hidden');cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});cameraPreview.srcObject=cameraStream;cameraMessage.classList.add('hidden')}catch(error){cameraMessage.textContent='Camera access is needed to take a photo. Please allow camera permission and try again.';cameraMessage.classList.remove('hidden')}}
+    $('captureButton').addEventListener('click',()=>{if(!cameraPreview.videoWidth)return;const canvas=document.createElement('canvas');canvas.width=cameraPreview.videoWidth;canvas.height=cameraPreview.videoHeight;canvas.getContext('2d').drawImage(cameraPreview,0,0);capturedPhoto.src=canvas.toDataURL('image/jpeg',.9);capturedPhoto.classList.remove('hidden');cameraPreview.classList.add('hidden');$('captureButton').classList.add('hidden');$('retakeButton').classList.remove('hidden');if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());photoTaken=true;readerContext='photo';updateNext()});
+    $('retakeButton').addEventListener('click',()=>{photoTaken=false;readerContext=null;capturedPhoto.classList.add('hidden');cameraPreview.classList.remove('hidden');$('captureButton').classList.remove('hidden');$('retakeButton').classList.add('hidden');next.classList.add('hidden');restart.classList.remove('hidden');startCamera()});
+    restart.addEventListener('click',()=>{if(cameraStream)cameraStream.getTracks().forEach(track=>track.stop());window.location.reload()});
+    function addClientMessage(text,fromSelf=false){if(!text.trim())return;const row=document.createElement('div');row.className='chat-enter mb-3 flex shrink-0 '+(fromSelf?'justify-end':'justify-start');const group=document.createElement('div');group.className='max-w-[80%]';if(!fromSelf){const label=document.createElement('div');label.className='mb-1 text-[10px] font-medium text-slate-500 dark:text-slate-400';label.textContent='Robo Tech Assistance';group.append(label)}const bubble=document.createElement('div');bubble.className=fromSelf?'rounded-2xl bg-black px-4 py-3 text-sm text-white dark:bg-white dark:text-black':'rounded-2xl bg-slate-200 px-4 py-3 text-sm text-black dark:bg-slate-700 dark:text-white';bubble.textContent=text;group.append(bubble);row.append(group);$('clientChatMessages').append(row);$('clientChatMessages').scrollTop=$('clientChatMessages').scrollHeight}
+    function createCaseId(){const now=new Date(),two=n=>String(n).padStart(2,'0'),date=two(now.getMonth()+1)+two(now.getDate())+now.getFullYear(),hours=now.getHours(),hour12=hours%12||12,time=two(hour12)+two(now.getMinutes())+two(now.getSeconds())+(hours>=12?'02':'01');const count=Number(localStorage.getItem('mpmsDispatcherCallCount')||'0')+1;localStorage.setItem('mpmsDispatcherCallCount',String(count));return date+'-'+time+'-00000000-'+String(count).padStart(8,'0')}
+    function showClientShareScreenRequest(){const row=document.createElement('div');row.className='chat-enter mb-3 flex shrink-0 justify-start';const group=document.createElement('div');group.className='w-full max-w-lg';const label=document.createElement('div');label.className='mb-1 text-[10px] font-medium text-slate-500 dark:text-slate-400';label.textContent='Robo Tech Assistance';const card=document.createElement('div');card.className='flex items-center gap-3 rounded-2xl bg-slate-200 p-4 text-black dark:bg-slate-700 dark:text-white';card.innerHTML='<span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-black dark:bg-slate-900 dark:text-white">▣</span><span class="flex-1 text-sm font-bold">Share Screen Request</span>';const accept=document.createElement('button');accept.type='button';accept.className='inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-white text-lg font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white';accept.textContent='→';accept.setAttribute('aria-label','Share your screen');let sharedStream=null;accept.addEventListener('click',async()=>{if(sharedStream){sharedStream.getTracks().forEach(track=>track.stop());sharedStream=null;accept.textContent='→';accept.classList.remove('rounded-lg','bg-red-600','text-white');accept.classList.add('rounded-full','bg-white','text-black');return}try{sharedStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});accept.textContent='■';accept.classList.remove('rounded-full','bg-white','text-black');accept.classList.add('rounded-lg','bg-red-600','text-white');sharedStream.getVideoTracks()[0]?.addEventListener('ended',()=>{sharedStream=null;accept.textContent='→';accept.classList.remove('rounded-lg','bg-red-600','text-white');accept.classList.add('rounded-full','bg-white','text-black')})}catch(error){}});card.append(accept);group.append(label,card);row.append(group);$('clientChatMessages').append(row);$('clientChatMessages').scrollTop=$('clientChatMessages').scrollHeight}window.showClientShareScreenRequest=showClientShareScreenRequest;
+    function resourceCategory(file){const ext=(file.name.split('.').pop()||'').toLowerCase(),type=file.type||'';if(type.startsWith('video/')||['mp4','mov','webm','mkv','avi'].includes(ext))return 'video';if(type.startsWith('audio/')||['mp3','wav','ogg','m4a','aac'].includes(ext))return 'audio';if(['js','ts','html','css','py','java','cpp','c','json','xml','sql','php'].includes(ext))return 'code';if(['txt','md','csv','log','rtf'].includes(ext))return 'text';if(['pdf','doc','docx','xls','xlsx','ppt','pptx'].includes(ext))return 'document';if(type.startsWith('image/'))return 'image';return 'file'}
+    function resourceIconClass(file){const cat=resourceCategory(file);return {video:'fa-file-video text-purple-500',audio:'fa-file-audio text-pink-500',code:'fa-file-code text-amber-500',text:'fa-file-lines text-slate-500',document:'fa-file-pdf text-red-500',image:'fa-file-image text-emerald-500',file:'fa-file text-slate-500'}[cat]}
+    function resourceIconMarkup(file){return '<i class="fa-solid '+resourceIconClass(file)+'" aria-hidden="true"></i>'}
+    const CASE_STORAGE_LIMIT=32*1024*1024;let caseStorageBytes=0;function updateCaseStorage(){const used=caseStorageBytes<1024*1024?(caseStorageBytes/1024).toFixed(1)+' KB':(caseStorageBytes/(1024*1024)).toFixed(1)+' MB';$('caseStorageLabel').textContent=used+'/32.0 MB'}let pendingFlaggedFile=null;async function addResourceFile(file,forceFlagged=false,readOnly=false,skipCheck=false){if(caseStorageBytes+file.size>CASE_STORAGE_LIMIT)return;caseStorageBytes+=file.size;updateCaseStorage();let flagged=forceFlagged;try{if(!forceFlagged&&!skipCheck&&window.RoboMod){const result=await RoboMod.analyze(file);flagged=!result.safe}}catch(error){}const row=document.createElement('tr');row.className='border-t border-slate-200 dark:border-slate-700';const cell=document.createElement('td');cell.className='px-3 py-2 font-medium';const fileButton=document.createElement('button');fileButton.type='button';fileButton.className='inline-flex items-center gap-2 text-left';fileButton.innerHTML=resourceIconMarkup(file)+'<span></span>';fileButton.querySelector('span').textContent=file.name;fileButton.addEventListener('click',()=>{if(flagged){pendingFlaggedFile=file;$('safetyModal').classList.remove('hidden');$('safetyModal').classList.add('flex')}else openResourceViewer(file)});const fileRow=document.createElement('div');fileRow.className='flex items-center justify-between gap-2';fileRow.append(fileButton);if(flagged){const eye=document.createElement('span');eye.innerHTML='<svg class="h-5 w-5 text-red-600" viewBox="0 0 24 24" fill="currentColor" aria-label="Flagged content"><path d="M12 4.5c4.5 0 8.1 2.75 10 7.5a12.4 12.4 0 0 1-3.15 4.55l-1.45-1.45A9.2 9.2 0 0 0 19.8 12C18.15 8.2 15.3 6.5 12 6.5c-.65 0-1.28.07-1.88.22L8.55 5.15A11 11 0 0 1 12 4.5zM3.2 2.4 2 3.6l3.05 3.05A12.7 12.7 0 0 0 2 12c1.9 4.75 5.5 7.5 10 7.5 1.58 0 3-.35 4.25-1l3.15 3.15 1.2-1.2L3.2 2.4zM8.3 9.9l1.65 1.65A2.5 2.5 0 0 0 12.45 14l1.65 1.65A4.5 4.5 0 0 1 8.3 9.9z"/></svg>';fileRow.append(eye)}cell.append(fileRow);row.append(cell);$('resourcesTableBody').append(row)}$('returnToSafety').addEventListener('click',()=>{$('safetyModal').classList.add('hidden');$('safetyModal').classList.remove('flex');pendingFlaggedFile=null});$('openFlaggedFile').addEventListener('click',()=>{const file=pendingFlaggedFile;$('returnToSafety').click();if(file)openResourceViewer(file)});
+    function closeResourceViewer(){$('fileViewerModal').classList.add('hidden');$('fileViewerModal').classList.remove('flex');$('fileViewerContent').innerHTML=''}
+    function openResourceViewer(file){const modal=$('fileViewerModal'),content=$('fileViewerContent');$('fileViewerTitle').textContent=file.name;$('fileViewerIcon').innerHTML='<i class="fa-solid '+resourceIconClass(file)+'" aria-hidden="true"></i>';content.innerHTML='';const url=URL.createObjectURL(file),type=file.type||'',extension=(file.name.split('.').pop()||'').toLowerCase();let viewer;if(type.startsWith('image/')){viewer=document.createElement('img');viewer.src=url;viewer.className='max-h-full max-w-full rounded-xl object-contain shadow-lg'}else if(type.startsWith('video/')){viewer=document.createElement('video');viewer.src=url;viewer.controls=true;viewer.className='max-h-full max-w-full rounded-xl bg-black'}else if(type.startsWith('audio/')){viewer=document.createElement('audio');viewer.src=url;viewer.controls=true;viewer.className='w-full max-w-xl'}else if(type==='application/pdf'||extension==='pdf'){viewer=document.createElement('iframe');viewer.src=url;viewer.className='h-full w-full rounded-xl bg-white'}else if(type.startsWith('text/')||['txt','md','json','csv','html','css','js','py'].includes(extension)){viewer=document.createElement('pre');viewer.className='h-full w-full overflow-auto rounded-xl bg-slate-950 p-5 text-left font-mono text-xs text-slate-100';const reader=new FileReader();reader.onload=()=>viewer.textContent=reader.result;reader.readAsText(file)}else{viewer=document.createElement('div');viewer.className='text-center text-sm text-slate-500';viewer.textContent='Preview is not available for this file type.'}content.append(viewer);modal.classList.remove('hidden');modal.classList.add('flex')}
+    $('closeFileViewer').addEventListener('click',closeResourceViewer);$('closeFileViewerButton').addEventListener('click',closeResourceViewer);
+    function showClientFileUploadRequest(){const row=document.createElement('div');row.className='chat-enter mb-3 flex shrink-0 justify-start';const group=document.createElement('div');group.className='w-full max-w-lg';const label=document.createElement('div');label.className='mb-1 text-[10px] font-medium text-slate-500 dark:text-slate-400';label.textContent='Robo Tech Assistance';const card=document.createElement('div');card.className='flex items-center gap-3 rounded-2xl bg-slate-200 p-4 text-black dark:bg-slate-700 dark:text-white';card.innerHTML='<span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-xl text-black dark:bg-slate-900 dark:text-white">⇧</span><span class="flex-1 text-sm font-bold">Upload Files</span>';const select=document.createElement('button');select.type='button';select.className='inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-white text-lg font-bold text-black dark:border-white dark:bg-slate-900 dark:text-white';select.textContent='→';select.setAttribute('aria-label','Select files to upload');const picker=document.createElement('input');picker.type='file';picker.multiple=true;picker.className='hidden';select.addEventListener('click',()=>picker.click());picker.addEventListener('change',()=>{[...picker.files].forEach(addResourceFile);if(picker.files.length){select.disabled=true;select.classList.add('cursor-not-allowed','border-slate-300','text-slate-400');select.classList.remove('border-black','text-black')}});card.append(select,picker);group.append(label,card);row.append(group);$('clientChatMessages').append(row);$('clientChatMessages').scrollTop=$('clientChatMessages').scrollHeight}window.showClientFileUploadRequest=showClientFileUploadRequest;
+    function connectClientChat(){const caseId=createCaseId();$('caseIdValue').value=caseId;$('headerActions').classList.add('hidden');$('caseIdHeader').classList.remove('hidden');$('caseIdHeader').classList.add('flex');$('mainContent').classList.add('hidden');$('clientChatScreen').classList.remove('hidden');$('clientChatScreen').classList.add('flex');$('clientChatComposer').focus()}
+    $('copyCaseIdButton').addEventListener('click',()=>navigator.clipboard?.writeText($('caseIdValue').value));
+    function sendClientChat(){addClientMessage($('clientChatComposer').value,true);$('clientChatComposer').value=''}
+    $('clientSendButton').addEventListener('click',sendClientChat);$('clientChatComposer').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendClientChat()}});
+    next.addEventListener('click',()=>{readerContext=null;if(currentStep===6||next.textContent.trim()==='Connect'){connectClientChat();return}if(currentStep===0){currentStep=1;qZero.classList.add('hidden');qOne.classList.remove('hidden');qOne.classList.add('swipe-left');next.classList.add('hidden');restart.classList.remove('hidden');const d=detectOS();userDetectedOS=d;if(d){const b=document.querySelector(`[data-os="${d}"]`);b.classList.add('detected');b.querySelector('.os-badge').classList.remove('hidden')}}else if(currentStep===1){currentStep=3;qOne.classList.add('hidden');qTwo.classList.add('hidden');qThree.classList.remove('hidden');qThree.classList.add('swipe-left');next.classList.add('hidden');restart.classList.remove('hidden');issue.focus()}else if(currentStep===3){currentStep=4;qThree.classList.add('hidden');qFour.classList.remove('hidden');qFour.classList.add('swipe-left');next.classList.add('hidden');restart.classList.remove('hidden')}else if(currentStep===4 || !qFour.classList.contains('hidden')){currentStep=5;qFour.classList.add('hidden');qFive.classList.remove('hidden');qFive.classList.remove('hidden');qFive.classList.add('swipe-left');next.classList.add('hidden');restart.classList.remove('hidden');startCamera()}else if(currentStep===5){currentStep=6;qFive.classList.add('hidden');qSix.classList.remove('hidden');qSix.classList.add('swipe-left');next.textContent='Connect';next.classList.remove('hidden');restart.classList.add('hidden')}else if(currentStep===6){connectClientChat()}});
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2aa5f19593bdf73',t:'MTc4NjY1MTkxMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
-
-
-
