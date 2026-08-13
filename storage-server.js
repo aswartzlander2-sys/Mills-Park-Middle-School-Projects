@@ -53,6 +53,7 @@ async function e2Request(method, key, body = Buffer.alloc(0), contentType = 'app
   return response;
 }
 
+// Authentication records and case assets are stored in the IDrive E2 bucket, never on the public web host.
 async function readUser(username) { try { const response = await e2Request('GET', `users/${username}.json`); return JSON.parse(await response.text()); } catch (error) { return null; } }
 async function ensureInitialUser() { const existing = await readUser(INITIAL_USER); if (existing) return existing; const record = { username: INITIAL_USER, passwordHash: INITIAL_USER_HASH, salt: INITIAL_USER_SALT, role: 'responder', createdAt: new Date().toISOString() }; await e2Request('PUT', `users/${INITIAL_USER}.json`, Buffer.from(JSON.stringify(record)), 'application/json'); return record; }
 function passwordHash(password, salt) { return crypto.pbkdf2Sync(String(password), salt, 210000, 32, 'sha256').toString('hex'); }
@@ -82,6 +83,7 @@ const server = http.createServer(async (req, res) => {
       if (!caseId || !filename || !payload.base64) return send(res, 400, { error: 'caseId, filename, and base64 are required.' });
       const body = Buffer.from(payload.base64, 'base64');
       if (body.length > 32 * 1024 * 1024) return send(res, 413, { error: 'Case file exceeds the 32 MB limit.' });
+      // Store case resources in the private IDrive E2 bucket under their case prefix.
       const key = `cases/${caseId}/${filename}`;
       await e2Request('PUT', key, body, payload.contentType || 'application/octet-stream');
       return send(res, 200, { ok: true, key });
